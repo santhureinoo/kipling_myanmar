@@ -18,12 +18,10 @@ const Course: NextPageWithLayout = () => {
         <h2 className="text-lg">Header 2</h2>
         <div className="md:flex flex-row gap-x-4 gap-y-4">
             <div className="md:w-1/2 w-full relative">
-                {/* <iframe id="iframe-video" onLoad={onLoad} src={`//drive.google.com/file/d/1gPE1ar6nhhB1vyH2HhlQttsqZv9oPOi3/preview`} sandbox="allow-scripts allow-forms allow-same-origin" className="w-full aspect-video" allow="autoplay" allowFullScreen></iframe>
+                <iframe className="w-full aspect-video" src="https://geo.dailymotion.com/player/xbcbr.html?video=k3QDtfJQww6SwhyEmot" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen frameBorder="0"></iframe>
+                {/* <iframe id="iframe-video" onLoad={onLoad} src={`https://drive.google.com/file/d/1gPE1ar6nhhB1vyH2HhlQttsqZv9oPOi3/preview`} sandbox="allow-scripts allow-forms allow-same-origin" className="w-full aspect-video" allow="autoplay" allowFullScreen></iframe>
                 <div className="removePopout">&nbsp;</div> */}
-                <object width="420" height="315" data={`//drive.google.com/file/d/1gPE1ar6nhhB1vyH2HhlQttsqZv9oPOi3/preview`}>
-
-                </object>
-                {/* <ReactPlayer controls={true} url='https://www.youtube.com/embed/ysz5S6PUM-U' config={{ youtube: { playerVars: { disablekb: 1 } } }} /> */}
+                {/* <ReactPlayer controls={true} url={"https://www.dailymotion.com/video/k66icVLCcISSo9yEmot"} config={{ dailymotion: { params: { "sharing-enable": false, 'ui-start-screen-info': false } } }} /> */}
             </div>
             <div className="md:w-1/2 w-full">
                 <ul className="menu w-full border bg-base-100 menu-compact lg:menu-normal rounded-box">
