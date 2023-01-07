@@ -36,6 +36,9 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
                         <div className="flex-none hidden lg:block">
                             <ul className="menu horizontal">
                                 <li>
+                                    <a href="./groups" className="rounded-btn">Groups</a>
+                                </li>
+                                <li>
                                     <a href="./users" className="rounded-btn">Users</a>
                                 </li>
                                 <li>
@@ -57,6 +60,9 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
                 <div className="drawer-side h-screen">
                     <label htmlFor="my-drawer-3" className="drawer-overlay"></label>
                     <ul className="p-4 overflow-y-auto menu w-80 bg-base-100">
+                        <li>
+                            <a href="./groups" className="rounded-btn">Groups</a>
+                        </li>
                         <li>
                             <a href="./users" className="rounded-btn">Users</a>
                         </li>
