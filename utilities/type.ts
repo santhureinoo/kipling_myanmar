@@ -151,14 +151,14 @@ export interface questions {
 }
 
 export namespace usersFields {
-    export type id = number;
+    export type id = string;
     export type name = string;
     export type password = string;
     export type status = number;
-
 }
 
 export interface users {
+    [key: string]: any;
     id: usersFields.id;
     name: usersFields.name;
     password: usersFields.password;

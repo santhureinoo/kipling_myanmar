@@ -24,3 +24,7 @@ video::-webkit-media-controls-panel {
     width: calc(100% + 30px) !important;
     /* Adjust as needed */
 }
+
+.error-msg {
+    @apply mt-2 text-sm text-red-600 dark:text-red-500
+}

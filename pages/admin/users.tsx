@@ -3,6 +3,11 @@ import excuteQuery from "../../utilities/db";
 import { users } from "../../utilities/type";
 import { NextPageWithLayout } from "../_app";
 import Layout from "./layout";
+import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
+import rfdc from "rfdc";
 
 // export async function getStaticProps(context: any) {
 //     let result;
@@ -23,15 +28,75 @@ import Layout from "./layout";
 //     }
 // }
 
-const Users: NextPageWithLayout = ({ result }: any) => {
-    const users: users[] = [];
+const cloneDeep = rfdc();
 
-    // const users: users[] = React.useMemo(() => {
-    //     return JSON.parse(result);
-    // }, [result]);
+const Users: NextPageWithLayout = ({ result }: any) => {
+    const [users, setUsers] = React.useState<users[]>([]);
+    const [pageIndex, setPageIndex] = React.useState(1);
+    const [loading, setLoading] = React.useState(false);
+    const router = useRouter();
+
+    React.useEffect(() => {
+
+        setLoading(true);
+
+        const options = {
+            url: '/api/user/list',
+            params: { page: pageIndex.toString() },
+        };
+
+        CapacitorHttp.get(options).then((response: HttpResponse) => {
+            setLoading(false);
+            setUsers(response.data);
+        }).catch(err => {
+            setLoading(false);
+            setUsers([]);
+        })
+    }, []);
+
+    const onChange = (index: number, attribute: string, value: any) => {
+        setLoading(true);
+        const cloneUsers = cloneDeep(users);
+        cloneUsers[index][attribute] = value;
+        const options = {
+            url: '/api/user/update',
+            data: cloneUsers[index]
+        };
+
+        CapacitorHttp.post(options).then((response: HttpResponse) => {
+            setLoading(false);
+            setUsers(cloneUsers);
+        }).catch(err => {
+            setLoading(false);
+        })
+    }
+
+    const onDelete = (index: number) => {
+        setLoading(true);
+        const cloneUsers = cloneDeep(users);
+        const options = {
+            url: '/api/user/delete',
+            data: cloneUsers[index]
+        };
+
+        CapacitorHttp.post(options).then((response: HttpResponse) => {
+            setLoading(false);
+            delete cloneUsers[index];
+            setUsers(cloneUsers);
+            // setUsers(cloneUsers);
+            // console.log(response.data);
+        }).catch(err => {
+            setLoading(false);
+        })
+    }
 
     return <React.Fragment>
         <div className="overflow-x-auto">
+            <button onClick={() => {
+                router.push('user/detail');
+            }} className="btn btn-primary float-right">
+                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> <span className="ml-2">Create User</span>
+            </button>
             <table className="table w-full table-zebra">
                 <thead>
                     <tr>
@@ -42,7 +107,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map(user => {
+                    {users.map((user, index) => {
                         return <tr key={`userRow-${user.id}`}>
                             <td>
                                 {user.id}
@@ -51,17 +116,25 @@ const Users: NextPageWithLayout = ({ result }: any) => {
                                 {user.name}
                             </td>
                             <td>
-                                <input type="checkbox" className="toggle" />
+                                <input type="checkbox" className="toggle" onChange={(event) => {
+                                    onChange(index, 'status', event.currentTarget.checked ? 1 : 0)
+                                }} checked={user.status ? true : false} />
                             </td>
                             <td>
-                                <label htmlFor={`my-modal-${user.id} cursor-pointer`} className="modal-button" >Delete</label>
-                                <input type="checkbox" id={`my-modal-${user.id}`} className="modal-toggle" />
+                                <span onClick={(event)=>{
+                                    router.push(`user/detail?id=${user.id}`)
+                                }} className="cursor-pointer mr-2">Edit</span>
+                                {/* The button to open modal */}
+                                <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label>
+
+                                {/* Put this part before </body> tag */}
+                                <input type="checkbox" id={`my-modal-${index}`} className="modal-toggle" />
                                 <div className="modal">
                                     <div className="modal-box">
                                         <p>Are you sure you want to delete?</p>
                                         <div className="modal-action">
-                                            <label htmlFor={`my-modal-${user.id}`} className="btn btn-primary">Accept</label>
-                                            <label htmlFor={`my-modal-${user.id}`} className="btn">Close</label>
+                                            <label onClick={event => { onDelete(index) }} htmlFor={`my-modal-${index}`} className="btn btn-primary">Accept</label>
+                                            <label htmlFor={`my-modal-${index}`} className="btn">Close</label>
                                         </div>
                                     </div>
                                 </div>

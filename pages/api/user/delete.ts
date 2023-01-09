@@ -32,7 +32,7 @@ export default function handler(
         return res.status(400);
     }
 
-    const query = user.insert(user.id.value(body.id), user.status.value(body.status), user.name.value(body.name), user.password.value(body.password)).toQuery();
+    const query = user.delete().where(user.id.equals(body.id)).toQuery();
     try {
         excuteQuery({ query: query.text, values: query.values }).then((result: any) => {
             return res.status(200).json(result)

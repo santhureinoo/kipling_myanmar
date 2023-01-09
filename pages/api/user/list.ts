@@ -14,9 +14,6 @@ export default function handler(
     res: NextApiResponse<Data>
 ) {
 
-    // Get data submitted in request's body.
-    const body: users = JSON.parse(req.body);
-
     //(optionally) set the SQL dialect
     const sql = new Sql('mysql');
 
@@ -25,14 +22,8 @@ export default function handler(
         columns: ['id', 'name', 'password', 'status']
     });
 
-    // Guard clause checks for first and last name,
-    // and returns early if they are not found
-    if (!body.name || !body.password) {
-        // Sends a HTTP bad request error code
-        return res.status(400);
-    }
+    const query = user.select(user.star()).toQuery();
 
-    const query = user.insert(user.id.value(body.id), user.status.value(body.status), user.name.value(body.name), user.password.value(body.password)).toQuery();
     try {
         excuteQuery({ query: query.text, values: query.values }).then((result: any) => {
             return res.status(200).json(result)

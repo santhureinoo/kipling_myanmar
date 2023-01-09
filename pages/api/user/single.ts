@@ -14,8 +14,12 @@ export default function handler(
     res: NextApiResponse<Data>
 ) {
 
-    // Get data submitted in request's body.
-    const body: users = JSON.parse(req.body);
+    // Guard clause checks for first and last name,
+    // and returns early if they are not found
+    if (!req.query["id"]) {
+        // Sends a HTTP bad request error code
+        return res.status(400);
+    }
 
     //(optionally) set the SQL dialect
     const sql = new Sql('mysql');
@@ -25,20 +29,17 @@ export default function handler(
         columns: ['id', 'name', 'password', 'status']
     });
 
-    // Guard clause checks for first and last name,
-    // and returns early if they are not found
-    if (!body.name || !body.password) {
-        // Sends a HTTP bad request error code
-        return res.status(400);
-    }
+    const query = user.select(user.star()).where(user.id.equals(req.query["id"])).toQuery();
 
-    const query = user.insert(user.id.value(body.id), user.status.value(body.status), user.name.value(body.name), user.password.value(body.password)).toQuery();
     try {
         excuteQuery({ query: query.text, values: query.values }).then((result: any) => {
-            return res.status(200).json(result)
+            if (result && result.length > 0)
+                return res.status(200).json(result[0]);
+            else
+                return res.status(400);
         })
 
     } catch (error: any) {
-        return res.status(400).json(error)
+        return res.status(400).json(error);
     }
 }
