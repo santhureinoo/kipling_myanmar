@@ -28,10 +28,9 @@ export async function getStaticProps(context: any) {
     }
 }
 
-const userDetail: NextPageWithLayout = ({ total }: any) => {
+const UserDetail: NextPageWithLayout = ({ total }: any) => {
 
-    const initial = initialUser(total);
-    const [user, setUser] = React.useState<users>(initial);
+    const [user, setUser] = React.useState<users>(initialUser(total));
     const [loading, setLoading] = React.useState(false);
     const router = useRouter();
 
@@ -47,7 +46,7 @@ const userDetail: NextPageWithLayout = ({ total }: any) => {
                 setUser(response.data);
             }).catch(err => {
                 setLoading(false);
-                setUser(initial);
+                setUser(initialUser(total));
             })
         } else {
             setLoading(false);
@@ -147,4 +146,4 @@ const userDetail: NextPageWithLayout = ({ total }: any) => {
     </React.Fragment >
 }
 
-export default userDetail;
+export default UserDetail;
