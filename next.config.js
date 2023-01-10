@@ -16,11 +16,11 @@ const nextConfig = {
   //   'MYSQL_PASSWORD': '',
   // },
    env: {
-    'MYSQL_HOST': 'vercel-db-7959.7tt.cockroachlabs.cloud',
-    'MYSQL_PORT': '26257',
-    'MYSQL_DATABASE': 'kipling_db',
-    'MYSQL_USER': 'new-admin',
-    'MYSQL_PASSWORD': 'q8WcvTTFOqIkB6UcI2TlwQ',
+    'MYSQL_HOST': 'sql6.freemysqlhosting.net',
+    'MYSQL_PORT': '3306',
+    'MYSQL_DATABASE': 'sql6589488',
+    'MYSQL_USER': 'sql6589488',
+    'MYSQL_PASSWORD': 'w7Rrfa5gUK',
   },
 }
 
