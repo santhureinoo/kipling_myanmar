@@ -3,15 +3,11 @@ import { datacatalog } from 'googleapis/build/src/apis/datacatalog';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Sql } from 'sql-ts';
 import excuteQuery from '../../../utilities/db';
-import { users } from '../../../utilities/type';
+import { users, users_courses } from '../../../utilities/type';
 
-type Data = {
-    name: string
-}
-
-export default function handler(
+export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<Data>
+    res: NextApiResponse
 ) {
 
     //  Guard clause checks for first and last name,
@@ -29,18 +25,41 @@ export default function handler(
 
     const user = sql.define<users>({
         name: 'users',
-        columns: ['id', 'name', 'password', 'status']
+        columns: ['id', 'name', 'password', 'status', 'phoneNumber']
     });
 
+    const uc = sql.define<users_courses>({
+        name: 'users_courses',
+        columns: ['users_id', 'courses_id', 'status']
+    });
+
+
+    const clearJuntionQuery = uc.delete().where(uc.users_id.equals(body.id)).toQuery();
+    const createJuntionQuery = (data: any[]) => {
+        return uc.insert(data).toQuery();
+    }
+
+    const { course_ids, course_names, ...editedBody } = body;
+
     const query = user.update(
-        body
+        editedBody
     ).where(user.id.equals(body.id)).toQuery();
     try {
-        excuteQuery({ query: query.text, values: query.values }).then((result: any) => {
-            return res.status(200).json({name:JSON.stringify(query)});
-        })
+        const result: any = await excuteQuery({ query: query.text, values: query.values });
+        if (body.course_ids) {
+            await excuteQuery({ query: clearJuntionQuery.text, values: clearJuntionQuery.values });
+            const data = body.course_ids.split(',').map(id => {
+                return {
+                    users_id: body.id,
+                    courses_id: id
+                }
+            });
+            const createJunctQuery = createJuntionQuery(data);
+            await excuteQuery({ query: createJunctQuery.text, values: createJunctQuery.values });
+        }
+        return res.status(200).json(result);
 
     } catch (error: any) {
-        return res.status(400).end();
+        return res.status(400).json(error);
     }
 }

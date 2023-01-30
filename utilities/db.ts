@@ -1,3 +1,4 @@
+import { CapacitorHttp, HttpResponse } from '@capacitor/core';
 import mysql from 'serverless-mysql';
 import { Sql } from 'sql-ts';
 import { users } from './type';
@@ -31,3 +32,31 @@ export function getUserSQLObj() {
     columns: ['id', 'name', 'password', 'status']
   });
 }
+
+export async function dailyMotionAuth(token: string | null) {
+  if (!token) {
+    let token;
+    const options = {
+      url: '/api/dailymotion_auth',
+    };
+    const response: HttpResponse = await CapacitorHttp.get(options)
+    // localStorage.setItem('daily_motion_token', JSON.stringify(response.data));
+    token = response.data;
+    return token;
+  } else {
+    const tokenData = JSON.parse(token || '');
+    return tokenData;
+  }
+}
+
+export const ironOptions = {
+  cookieName: "iron_session_cookie",
+  password: process.env.IRON_SESSION_PASS || '',
+  // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
+  cookieOptions: {
+    secure: process.env.NODE_ENV === "production",
+  },
+};
+
+
+export const mysqlLastId = 'SELECT LAST_INSERT_ID() as ID';

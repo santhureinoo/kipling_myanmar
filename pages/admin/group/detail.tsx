@@ -1,8 +1,9 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { MultiSelect } from "react-multi-select-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus, faClose, faSearch, faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import Layout from "../layout";
 
 const options = [
     { label: "Grapes 🍇", value: "grapes" },
@@ -117,6 +118,14 @@ const ExerciseDetail: NextPageWithLayout = () => {
             </div>
         </div>
     </React.Fragment >
+}
+
+ExerciseDetail.getLayout = function getLayout(page: ReactElement) {
+    return (
+        <Layout>
+            {page}
+        </Layout>
+    )
 }
 
 export default ExerciseDetail;

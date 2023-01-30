@@ -11,7 +11,7 @@
 
 
 export namespace answersFields {
-    export type id = number;
+    export type id = string;
     export type question_id = number;
     export type answer = string;
     export type type = number;
@@ -21,8 +21,9 @@ export namespace answersFields {
 }
 
 export interface answers {
-    id: answersFields.id;
-    question_id: answersFields.question_id;
+    [key: string]: any;
+    id?: answersFields.id;
+    question_id?: answersFields.question_id;
     answer: answersFields.answer;
     type: answersFields.type;
     valid: answersFields.valid;
@@ -34,34 +35,41 @@ export namespace coursesFields {
     export type id = number;
     export type photo = string | null;
     export type name = string;
-    export type description = number | null;
+    export type description = string | null;
     export type trailer_id = number | null;
 
 }
 
 export interface courses {
-    id: coursesFields.id;
+    [key: string]: any;
+    id?: coursesFields.id;
     photo: coursesFields.photo;
     name: coursesFields.name;
     description: coursesFields.description;
     trailer_id: coursesFields.trailer_id;
 
+    //Custom 
+    exercise_counts?: number;
+    exercise_names?: string;
+    exercise_ids?: string;
 }
 
 export namespace exercisesFields {
-    export type id = number;
+    export type id = number | undefined;
     export type name = string;
-    export type exams_id = number;
-    export type courses_id = number;
-
+    export type courses_id = string;
 }
 
 export interface exercises {
-    id: exercisesFields.id;
+    [key: string]: any;
+    id?: exercisesFields.id;
     name: exercisesFields.name;
-    exams_id: exercisesFields.exams_id;
-    courses_id: exercisesFields.courses_id;
+    courses_id?: exercisesFields.courses_id;
 
+    //Custom
+    questions?: questions[];
+    files?: multiple_select[];
+    actualFiles?: files[];
 }
 
 export namespace exercises_filesFields {
@@ -81,15 +89,19 @@ export namespace filesFields {
     export type name = string;
     export type unique_name = string;
     export type status = number;
+    export type created_at = string;
+    export type updated_at = string;
 
 }
 
 export interface files {
-    id: filesFields.id;
+    [key: string]: any;
+    id?: filesFields.id;
     name: filesFields.name;
     unique_name: filesFields.unique_name;
     status: filesFields.status;
-
+    created_at?: filesFields.created_at;
+    updated_at?: filesFields.updated_at;
 }
 
 export namespace groupsFields {
@@ -118,6 +130,7 @@ export interface groups_courses {
     courseId: groups_coursesFields.courseId;
     status: groups_coursesFields.status;
 
+
 }
 
 export namespace groups_usersFields {
@@ -135,19 +148,20 @@ export interface groups_users {
 }
 
 export namespace questionsFields {
-    export type id = number;
+    export type id = string | undefined;
     export type question = string;
     export type type = number;
-    export type exercise_id = number;
+    export type exercise_id = number | undefined;
 
 }
 
 export interface questions {
-    id: questionsFields.id;
+    [key: string]: any;
+    id?: questionsFields.id;
     question: questionsFields.question;
     type: questionsFields.type;
     exercise_id: questionsFields.exercise_id;
-
+    answers?: answers[];
 }
 
 export namespace usersFields {
@@ -155,6 +169,8 @@ export namespace usersFields {
     export type name = string;
     export type password = string;
     export type status = number;
+    export type phoneNumber = string;
+    export type role = number;
 }
 
 export interface users {
@@ -162,8 +178,11 @@ export interface users {
     id: usersFields.id;
     name: usersFields.name;
     password: usersFields.password;
+    phoneNumber?: usersFields.phoneNumber;
+    role: number;
     status: usersFields.status;
-
+    course_ids?: string;
+    course_names?: string;
 }
 
 export namespace users_coursesFields {
@@ -178,4 +197,17 @@ export interface users_courses {
     courses_id: users_coursesFields.courses_id;
     status: users_coursesFields.status;
 
+}
+
+
+export interface multiple_select {
+    label: string;
+    value: any;
+}
+
+export interface login_credential {
+    name: string;
+    password: string;
+    phoneNumber: string;
+    confirm?: string;
 }

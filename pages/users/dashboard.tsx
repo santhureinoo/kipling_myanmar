@@ -5,6 +5,8 @@ import React, { ReactElement } from "react";
 import { NextPageWithLayout } from "../_app";
 import Layout from "./layout";
 import { useRouter } from "next/navigation";
+import { CapacitorHttp, HttpResponse } from "@capacitor/core";
+import { courses } from "../../utilities/type";
 
 export type DriveFile = {
     kind: string;
@@ -20,6 +22,21 @@ export type Data = {
 const Dashboard: NextPageWithLayout = () => {
 
     const router = useRouter();
+    const [courses, setCourses] = React.useState<courses[]>([]);
+
+    React.useEffect(() => {
+        const options = {
+            url: `/api/course/list`,
+        };
+        CapacitorHttp.post(options).then((response: HttpResponse) => {
+            setCourses(response.data);
+
+        }).catch(err => {
+            console.log(err);
+        });
+
+    }, []);
+
     // Array of API discovery doc URLs for APIs
     const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
 
@@ -41,7 +58,23 @@ const Dashboard: NextPageWithLayout = () => {
                                 </div>
                             </div>
                         </div> */}
-                        <div className="card shadow-xl image-full shadow-2xl">
+                        {courses.map((course, index) => {
+                            return <div key={`course-${index}`} className="card shadow-xl image-full shadow-2xl">
+                                <figure>
+                                    <img src={`https://api.lorem.space/image/book?w=300&h=140`} />
+                                </figure>
+                                <div className="justify-end card-body">
+                                    <h2 className="card-title">{course.name}</h2>
+                                    <p>{course.description}</p>
+                                    <div className="card-actions">
+                                        <button onClick={() => {
+                                            router.push(`./course?id=${course.id}`)
+                                        }} className="btn btn-primary">Start Lesson</button>
+                                    </div>
+                                </div>
+                            </div>
+                        })}
+                        {/* <div className="card shadow-xl image-full shadow-2xl">
                             <figure>
                                 <img src={`https://api.lorem.space/image/book?w=300&h=140`} />
                             </figure>
@@ -49,7 +82,7 @@ const Dashboard: NextPageWithLayout = () => {
                                 <h2 className="card-title">Elementary Class</h2>
                                 <p>This is for the kids who try to taste the world of Engish.</p>
                                 <div className="card-actions">
-                                    <button onClick={()=>{
+                                    <button onClick={() => {
                                         router.push('./course')
                                     }} className="btn btn-primary">Start Lesson</button>
                                 </div>
@@ -67,7 +100,7 @@ const Dashboard: NextPageWithLayout = () => {
                                     <button className="btn btn-primary">Get Started</button>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </section>

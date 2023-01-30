@@ -1,13 +1,14 @@
-import React, { FormEvent } from "react";
+import React, { FormEvent, ReactElement } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { useRouter } from "next/router";
 import { CapacitorHttp, HttpResponse } from "@capacitor/core";
-import { users } from "../../../utilities/type";
+import { courses, multiple_select, users } from "../../../utilities/type";
 import { initialUser } from "../../../utilities/defaultData";
 import rfdc from "rfdc";
 import excuteQuery, { getUserSQLObj } from "../../../utilities/db";
 import { Formik, Form, Field } from 'formik';
-import { stringify } from "querystring";
+import { MultiSelect } from "react-multi-select-component";
+import Layout from "../layout";
 
 const cloneDeep = rfdc();
 const options = [
@@ -30,8 +31,9 @@ export async function getStaticProps(context: any) {
 
 const UserDetail: NextPageWithLayout = ({ total }: any) => {
 
-    const [user, setUser] = React.useState<users>(initialUser(total));
+    const [user, setUser] = React.useState<users>(initialUser(parseInt(total) + 1));
     const [loading, setLoading] = React.useState(false);
+    const [options, setOptions] = React.useState<{ label: string | null, value: any }[]>([]);
     const router = useRouter();
 
     React.useEffect(() => {
@@ -53,11 +55,27 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
         }
     }, [router.isReady])
 
+    const multiOptions = React.useMemo(() => {
+        let result: multiple_select[] = [];
+        if (user.course_ids && user.course_ids !== '') {
+            const courseNameArr = user.course_names?.split(',') || [];
+            result = user.course_ids.split(',').map((id, index) => {
+                return {
+                    label: courseNameArr[index],
+                    value: id
+                }
+            })
+        }
+
+        console.log(result);
+
+        return result;
+    }, [user.course_names, user.course_ids])
+
     const onSave = (event: any) => {
         setLoading(true);
         const options = {
             url: `/api/user/${router.query['id'] ? 'update' : 'create'}`,
-            headers: { 'X-Fake-Header': 'Fake-Value' },
             params: { size: 'XL' },
             data: user,
         };
@@ -71,8 +89,37 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
 
     const onChange = (attribute: string, value: any) => {
         const cloneUser = cloneDeep(user);
-        cloneUser[attribute] = value;
+        if (attribute === 'course') {
+            const coursesSelection: multiple_select[] = value;
+            cloneUser.course_ids = coursesSelection.length > 0 ? coursesSelection.map(sel => sel.value).join(',') : '';
+            cloneUser.course_names = coursesSelection.length > 0 ? coursesSelection.map(sel => sel.label).join(',') : '';
+        } else {
+            cloneUser[attribute] = value;
+
+        }
         setUser(cloneUser);
+    }
+
+    const filterOptions = async (options: any, filter: any) => {
+        // alert("filtering", filter);
+
+        if (!filter) {
+            return options;
+        }
+        const opt = {
+            url: `/api/course/list`,
+            params: { name: filter },
+        };
+        const response = await CapacitorHttp.post(opt);
+        const courses: courses[] = response.data;
+        if (courses && courses.length > 0) {
+            // setOptions(courses.map(cou => { return { label: cou.id?.toString() || '', value: cou.name } }));
+            options = courses.map(cou => { return { value: cou.id?.toString() || '', label: cou.name } });
+            const re = new RegExp(filter, "i");
+            return options.filter(({ label }: any) => label && label.match(re));
+        } else {
+            return options;
+        }
     }
 
     return <React.Fragment>
@@ -97,8 +144,6 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                 onSubmit={(_, { setSubmitting }) => {
                     const options = {
                         url: `/api/user/${router.query['id'] ? 'update' : 'create'}`,
-                        headers: { 'X-Fake-Header': 'Fake-Value' },
-                        params: { size: 'XL' },
                         data: user,
                     };
 
@@ -127,6 +172,31 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.password}</p>
                             </div>
                             <div className="form-control col-span-2">
+                                <label className="label">
+                                    <span className="label-text">Phone Number</span>
+                                </label>
+                                <Field id="password" name="password" type="text" onChange={(event: any) => { onChange('phoneNumber', event.currentTarget.value) }}  value={user.phoneNumber} placeholder="Phone Number" className={`input input-bordered`} />
+                                <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.password}</p>
+                            </div>
+
+                            <div className="form-control col-span-2">
+                                <label className="label">
+                                    <span className="label-text">Courses</span>
+                                </label>
+                                <Field
+                                    component={MultiSelect}
+                                    options={options}
+                                    value={multiOptions}
+                                    filterOptions={filterOptions}
+                                    onChange={(val: any) => {
+                                        onChange('course', val);
+                                    }}
+                                    labelledBy="Select"
+                                    name="trailers"
+                                />
+
+                            </div>
+                            <div className="form-control col-span-2">
                                 <label className="label cursor-pointer">
                                     <span className="label-text">Status</span>
                                     <Field id="status" name="status" type="checkbox" className="toggle" onChange={(event: any) => { onChange('status', event.currentTarget.checked ? 1 : 0) }} checked={user.status === 0 ? false : true} />
@@ -145,5 +215,14 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
         </div>
     </React.Fragment >
 }
+
+UserDetail.getLayout = function getLayout(page: ReactElement) {
+    return (
+        <Layout>
+            {page}
+        </Layout>
+    )
+}
+
 
 export default UserDetail;

@@ -1,5 +1,9 @@
 import Head from "next/head";
 import React from "react";
+import Image from 'next/image';
+import { CapacitorHttp, HttpResponse } from "@capacitor/core";
+import { useRouter } from "next/navigation";
+import { RingLoader } from "react-spinners";
 
 interface Props {
     title?: string;
@@ -9,6 +13,35 @@ interface Props {
 }
 
 const Layout = ({ title = "", children, disableHeader = false, disableSideBar = false }: Props) => {
+    const router = useRouter();
+    const [isAuth, setIsAuth] = React.useState<boolean | undefined>();
+
+    React.useEffect(() => {
+        const options = {
+            url: '/api/auth/user',
+        };
+
+        CapacitorHttp.get(options).then((response: HttpResponse) => {
+            if (response.data.isAuth === true && response.data.user.admin === false) {
+                setIsAuth(true);
+            } else {
+                setIsAuth(false);
+                router.push('/');
+            }
+        });
+    }, [])
+
+    const onLogout = () => {
+        const options = {
+            url: '/api/auth/logout',
+        };
+
+        CapacitorHttp.get(options).then((response: HttpResponse) => {
+            if (response.data.ok) {
+                router.push('/');
+            }
+        });
+    }
     return <React.Fragment>
         <Head>
             <title>Create Next App (Client)</title>
@@ -17,61 +50,83 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
             <link rel="icon" href="/favicon.ico" />
         </Head>
         <main>
-            <div className="rounded-lg shadow bg-base-200 drawer h-full">
-                <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
-                <div className="flex flex-col drawer-content">
-                    <div className="w-full navbar bg-base-300">
-                        <div className="flex-none lg:hidden">
-                            <label htmlFor="my-drawer-3" className="btn btn-square btn-ghost">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                                </svg>
-                            </label>
+            {isAuth === true ?
+                <div className="rounded-lg shadow bg-base-200 drawer h-full">
+                    <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
+                    <div className="flex flex-col drawer-content">
+                        <div className="w-full navbar bg-base-300">
+                            <div className="flex-none lg:hidden">
+                                <label htmlFor="my-drawer-3" className="btn btn-square btn-ghost">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                    </svg>
+                                </label>
+                            </div>
+                            <div className="relative h-full w-16 flex-1 px-2 mx-2">
+                                {/* <span>
+                               Change screen size to show/hide menu
+                           </span> */}
+                                <Image
+                                    src="/logo.png"
+                                    alt="Picture of the author"
+                                    // layout="fit"
+                                    width={100}
+                                    height={50}
+                                />
+                            </div>
+                            <div className="flex-none hidden lg:block">
+                                <ul className="menu horizontal">
+                                    <li>
+                                        <button type="button" onClick={(event) => {
+                                            onLogout();
+                                        }} className="rounded-btn">Log Out</button>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <div className="flex-1 px-2 mx-2">
-                            <span>
-                                Change screen size to show/hide menu
-                            </span>
+                        <div className="md:m-12 m-2">
+                            {children}
                         </div>
-                        {/* <div className="flex-none hidden lg:block">
-                            <ul className="menu horizontal">
-                                <li>
-                                    <a href="./users" className="rounded-btn">Users</a>
-                                </li>
-                                <li>
-                                    <a href="./courses" className="rounded-btn">Courses</a>
-                                </li>
-                                <li>
-                                    <a href="./exercises" className="rounded-btn">Exercises</a>
-                                </li>
-                                <li>
-                                    <a href="./files" className="rounded-btn">Files</a>
-                                </li>
-                            </ul>
-                        </div> */}
                     </div>
-                    <div className="md:m-12 m-2">
-                        {children}
+                    <div className="drawer-side h-screen">
+                        <label htmlFor="my-drawer-3" className="drawer-overlay"></label>
+                        <ul className="p-4 overflow-y-auto menu w-80 bg-base-100">
+                            <li>
+                                <button type="button" onClick={(event) => {
+                                    onLogout();
+                                }} className="rounded-btn">Log Out</button>
+                            </li>
+                            {/* <li>
+                           <a href="./users" className="rounded-btn">Users</a>
+                       </li>
+                       <li>
+                           <a href="./courses" className="rounded-btn">Courses</a>
+                       </li>
+                       <li>
+                           <a href="./exercises" className="rounded-btn">Exercises</a>
+                       </li>
+                       <li>
+                           <a href="./files" className="rounded-btn">Files</a>
+                       </li> */}
+                        </ul>
                     </div>
                 </div>
-                <div className="drawer-side h-screen">
-                    <label htmlFor="my-drawer-3" className="drawer-overlay"></label>
-                    <ul className="p-4 overflow-y-auto menu w-80 bg-base-100">
-                        {/* <li>
-                            <a href="./users" className="rounded-btn">Users</a>
-                        </li>
-                        <li>
-                            <a href="./courses" className="rounded-btn">Courses</a>
-                        </li>
-                        <li>
-                            <a href="./exercises" className="rounded-btn">Exercises</a>
-                        </li>
-                        <li>
-                            <a href="./files" className="rounded-btn">Files</a>
-                        </li> */}
-                    </ul>
-                </div>
-            </div>
+                :
+                <React.Fragment>
+                    <div className="flex min-h-screen justify-center items-center">
+                        <div>
+                            <RingLoader
+                                color={'black'}
+                                loading={true}
+                                size={150}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            />
+                            <h2 className='text-lg text-center'>Loading...</h2>
+                        </div>
+                    </div>
+                </React.Fragment>}
+
         </main>
         <footer className="items-center p-4 footer bg-neutral text-neutral-content">
             <div className="items-center grid-flow-col">
