@@ -22,9 +22,10 @@ export async function getStaticProps(context: any) {
     const userSql = getUserSQLObj();
     const totalQuery = userSql.select(userSql.count()).toQuery();
     const countObj: any = await excuteQuery({ query: totalQuery.text });
+
     return {
         props: {
-            total: JSON.stringify(countObj[0].users_count)
+            total: JSON.stringify(countObj && countObj.length > 0 ? countObj[0].users_count : 0)
         }, // will be passed to the page component as props
     }
 }
@@ -175,7 +176,7 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                                 <label className="label">
                                     <span className="label-text">Phone Number</span>
                                 </label>
-                                <Field id="password" name="password" type="text" onChange={(event: any) => { onChange('phoneNumber', event.currentTarget.value) }}  value={user.phoneNumber} placeholder="Phone Number" className={`input input-bordered`} />
+                                <Field id="password" name="password" type="text" onChange={(event: any) => { onChange('phoneNumber', event.currentTarget.value) }} value={user.phoneNumber} placeholder="Phone Number" className={`input input-bordered`} />
                                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.password}</p>
                             </div>
 
