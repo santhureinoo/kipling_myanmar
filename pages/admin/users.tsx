@@ -125,7 +125,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
                                     router.push(`user/detail?id=${user.id}`)
                                 }} className="cursor-pointer mr-2">Edit</span>
                                 {/* The button to open modal */}
-                                <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label>
+                                {/* <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label> */}
 
                                 {/* Put this part before </body> tag */}
                                 <input type="checkbox" id={`my-modal-${index}`} className="modal-toggle" />

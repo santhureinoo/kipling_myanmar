@@ -26,11 +26,11 @@ const Dashboard: NextPageWithLayout = () => {
 
     React.useEffect(() => {
         const options = {
-            url: `/api/course/list`,
+            url: `/api/course/user_list`,
         };
+        
         CapacitorHttp.post(options).then((response: HttpResponse) => {
             setCourses(response.data);
-
         }).catch(err => {
             console.log(err);
         });
@@ -59,10 +59,10 @@ const Dashboard: NextPageWithLayout = () => {
                             </div>
                         </div> */}
                         {courses.map((course, index) => {
-                            return <div key={`course-${index}`} className="card shadow-xl image-full shadow-2xl">
-                                <figure>
+                            return <div key={`course-${index}`} className="card bg-[#f5f5f5] shadow-lg rounded-md shadow-2xl">
+                                {/* <figure>
                                     <img src={`https://api.lorem.space/image/book?w=300&h=140`} />
-                                </figure>
+                                </figure> */}
                                 <div className="justify-end card-body">
                                     <h2 className="card-title">{course.name}</h2>
                                     <p>{course.description}</p>

@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import { NextPageWithLayout } from "../_app";
 import Layout from "./layout";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -47,6 +47,28 @@ const Courses: NextPageWithLayout = () => {
         })
     }
 
+    const onChange = (event: ChangeEvent<HTMLInputElement>, index: number, attribute: string, value: any) => {
+        const clonedCourses = cloneDeep(courses);
+
+        clonedCourses[index][attribute] = value;
+
+        const currentCourse: courses = clonedCourses[index];
+
+        delete currentCourse.created_at;
+        delete currentCourse.updated_at;
+
+        const options = {
+            url: `/api/course/update`,
+            data: currentCourse,
+        };
+
+        CapacitorHttp.post(options).then((response: HttpResponse) => {
+            setCourses(clonedCourses);
+        }).catch(err => {
+        })
+
+    }
+
     return <React.Fragment>
         <div className="overflow-x-auto">
             <button onClick={() => {
@@ -60,7 +82,7 @@ const Courses: NextPageWithLayout = () => {
                         <th></th>
                         <th>Name</th>
                         <th>Description</th>
-                        {/* <th>Approve/Suspend</th> */}
+                        <th>Approve/Suspend</th>
                         <th>Options</th>
                     </tr>
                 </thead>
@@ -76,6 +98,9 @@ const Courses: NextPageWithLayout = () => {
                             <td>
                                 {course.description}
                             </td>
+                            <td>
+                                <input type="checkbox" className="toggle" onChange={(event) => onChange(event, index, 'status', course.status === 1 ? 0 : 1)} checked={course.status === 1 ? true : false} />
+                            </td>
                             {/* <td>
                                 <input type="checkbox" className="toggle" />
                             </td> */}
@@ -87,7 +112,7 @@ const Courses: NextPageWithLayout = () => {
                                     router.push(`course/detail?id=${course.id}`)
                                 }} className="cursor-pointer mr-2">Edit</span>
                                 {/* The button to open modal */}
-                                <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label>
+                                {/* <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label> */}
 
                                 {/* Put this part before </body> tag */}
                                 <input type="checkbox" id={`my-modal-${index}`} className="modal-toggle" />

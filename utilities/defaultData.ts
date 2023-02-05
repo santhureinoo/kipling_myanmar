@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { answers, courses, files, multiple_select, questions, users } from './type';
+import { answers, courses, exercises, files, multiple_select, questions, users } from './type';
 
 function pad(num: number) {
     let numStr = num.toString();
@@ -24,7 +24,7 @@ export const initialExercise = () => {
         courses_id: '',
         questions: [] as questions[],
         files: [] as multiple_select[],
-    }
+    } as exercises
 }
 
 export const initialQuestion = (id: number) => {

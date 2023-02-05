@@ -104,7 +104,7 @@ const Files: NextPageWithLayout = () => {
                         };
                         CapacitorHttp.post(options).then((response: HttpResponse) => {
                             const currentFile: files = {
-                                name: newFileName ? newFileName + (selectedfiles.length > 0 ? `-${index}` : '') : file.name.split('.')[0],
+                                name: newFileName ? newFileName + (selectedfiles.length > 1 ? `-${index}` : '') : file.name.split('.')[0],
                                 unique_name: response.data.id,
                                 status: 0,
                             };
@@ -232,7 +232,7 @@ const Files: NextPageWithLayout = () => {
                         <th></th>
                         <th>Name</th>
                         <th>Approve/Suspend</th>
-                        <th>Options</th>
+                        {/* <th>Options</th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -248,7 +248,7 @@ const Files: NextPageWithLayout = () => {
                                 <input type="checkbox" className="toggle" onChange={(event) => onChange(event, index, 'status', file.status === 1 ? 0 : 1)} checked={file.status === 1 ? true : false} />
                             </td>
                             <td>
-                                <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label>
+                                {/* <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label> */}
 
                                 {/* Put this part before </body> tag */}
                                 <input type="checkbox" id={`my-modal-${index}`} className="modal-toggle" />
@@ -276,14 +276,14 @@ const Files: NextPageWithLayout = () => {
                         <div className="form-control w-full">
                             <label className="input-group">
                                 <span className="w-1/4">File Name</span>
-                                <input type="text" placeholder="info@site.com" value={newFileName} onChange={(event) => { setNewFileName(event.currentTarget.value) }} className="input w-3/4 input-bordered" />
+                                <input type="text" placeholder="Enter file name" value={newFileName} onChange={(event) => { setNewFileName(event.currentTarget.value) }} className="input w-3/4 input-bordered" />
                             </label>
                         </div>
                     </div>
 
                     <p className="py-4">Select videos first, then click the upload button below. This dialog will be closed once it is done uploading. Thank you!</p>
                     <div className="modal-action">
-                        <label htmlFor="file-upload" className="btn" ref={btnClose}>Close</label>
+                        <label htmlFor="file-upload" className={`btn ${loading ? 'hidden' : ''}`} ref={btnClose}>Close</label>
                         <button className="btn" disabled={loading} onClick={() => onFileSelect()}>
                             {<ClipLoader
                                 color={'white'}

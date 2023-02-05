@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import { NextPageWithLayout } from "../_app";
 import Layout from "./layout";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -43,6 +43,28 @@ const Exercises: NextPageWithLayout = () => {
         })
     }
 
+    const onChange = (event: ChangeEvent<HTMLInputElement>, index: number, attribute: string, value: any) => {
+        const clonedExercises = cloneDeep(exercises);
+
+        clonedExercises[index][attribute] = value;
+
+        const currentExercise: exercises = clonedExercises[index];
+
+        delete currentExercise.created_at;
+        delete currentExercise.updated_at;
+
+        const options = {
+            url: `/api/exercise/update`,
+            data: currentExercise,
+        };
+
+        CapacitorHttp.post(options).then((response: HttpResponse) => {
+            setExercises(clonedExercises);
+        }).catch(err => {
+        })
+
+    }
+
     return <React.Fragment>
         <div className="overflow-x-auto">
             <button onClick={() => {
@@ -55,7 +77,7 @@ const Exercises: NextPageWithLayout = () => {
                     <tr>
                         <th></th>
                         <th>Name</th>
-                        {/* <th>Approve/Suspend</th> */}
+                        <th>Approve/Suspend</th>
                         <th>Options</th>
                     </tr>
                 </thead>
@@ -68,18 +90,15 @@ const Exercises: NextPageWithLayout = () => {
                             <td>
                                 {exe.name}
                             </td>
-                            {/* <td>
-                                <input type="checkbox" className="toggle" />
-                            </td> */}
-                            {/* <td>
-                                <FontAwesomeIcon icon={faEllipsisV} />
-                            </td> */}
+                            <td>
+                                <input type="checkbox" className="toggle" onChange={(event) => onChange(event, index, 'status', exe.status === 1 ? 0 : 1)} checked={exe.status === 1 ? true : false} />
+                            </td>
                             <td>
                                 <span onClick={(event) => {
                                     router.push(`exercise/detail?id=${exe.id}`)
                                 }} className="cursor-pointer mr-2">Edit</span>
                                 {/* The button to open modal */}
-                                <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label>
+                                {/* <label htmlFor={`my-modal-${index}`} className="cursor-pointer">Delete</label> */}
 
                                 {/* Put this part before </body> tag */}
                                 <input type="checkbox" id={`my-modal-${index}`} className="modal-toggle" />

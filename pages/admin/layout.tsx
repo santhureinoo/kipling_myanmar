@@ -70,19 +70,19 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
                             <div className="flex-none hidden lg:block">
                                 <ul className="menu horizontal">
                                     <li>
-                                        <a href="./groups" className="rounded-btn">Groups</a>
+                                        <a href="/admin/groups" className="rounded-btn">Groups</a>
                                     </li>
                                     <li>
-                                        <a href="./users" className="rounded-btn">Users</a>
+                                        <a href="/admin/users" className="rounded-btn">Users</a>
                                     </li>
                                     <li>
-                                        <a href="./courses" className="rounded-btn">Courses</a>
+                                        <a href="/admin/courses" className="rounded-btn">Courses</a>
                                     </li>
                                     <li>
-                                        <a href="./exercises" className="rounded-btn">Exercises</a>
+                                        <a href="/admin/exercises" className="rounded-btn">Exercises</a>
                                     </li>
                                     <li>
-                                        <a href="./files" className="rounded-btn">Files</a>
+                                        <a href="/admin/files" className="rounded-btn">Files</a>
                                     </li>
                                     <li>
                                         <button type="button" onClick={(event) => {
@@ -100,19 +100,19 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
                         <label htmlFor="my-drawer-3" className="drawer-overlay"></label>
                         <ul className="p-4 overflow-y-auto menu w-80 bg-base-100">
                             <li>
-                                <a href="./groups" className="rounded-btn">Groups</a>
+                                <a href="/admin/groups" className="rounded-btn">Groups</a>
                             </li>
                             <li>
-                                <a href="./users" className="rounded-btn">Users</a>
+                                <a href="/admin/users" className="rounded-btn">Users</a>
                             </li>
                             <li>
-                                <a href="./courses" className="rounded-btn">Courses</a>
+                                <a href="/admin/courses" className="rounded-btn">Courses</a>
                             </li>
                             <li>
-                                <a href="./exercises" className="rounded-btn">Exercises</a>
+                                <a href="/admin/exercises" className="rounded-btn">Exercises</a>
                             </li>
                             <li>
-                                <a href="./files" className="rounded-btn">Files</a>
+                                <a href="/admin/files" className="rounded-btn">Files</a>
                             </li>
                             <li>
                                 <button type="button" onClick={(event) => {

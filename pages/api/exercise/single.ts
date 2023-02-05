@@ -69,6 +69,12 @@ export default async function handler(
             const currentAnswersRes: any = await excuteQuery({ query: answerQuery(currentQuestionsRes.map((que: any) => que.id)).text, values: answerQuery(currentQuestionsRes.map((que: any) => que.id)).values });
             const currentFilesRes: any = await excuteQuery({ query: exerciseFileQuery(currentExercise.id).text, values: exerciseFileQuery(currentExercise.id).values });
             currentExercise.actualFiles = currentFilesRes;
+            currentExercise.files = currentFilesRes.map((fileRes: files) => {
+                return {
+                    label: fileRes.name,
+                    value: fileRes.id,
+                }
+            })
             currentExercise.questions = currentQuestionsRes.map((quest: questions) => {
                 const currentAnsArr = currentAnswersRes.filter((ans: answers) => {
                     return ans.question_id === quest.id

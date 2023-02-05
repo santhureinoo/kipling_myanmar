@@ -133,14 +133,14 @@ const ExerciseDetail: NextPageWithLayout = () => {
         };
         const response = await CapacitorHttp.post(opt);
         const files: files[] = response.data;
-        if (files && files.length > 0) {
-            // setOptions(files.map(fil => { return { label: fil.id?.toString() || '', value: fil.name } }));
-            options = files.map(fil => { return { value: fil.id?.toString() || '', label: fil.name } });
-            const re = new RegExp(filter, "i");
-            return options.filter(({ label }: any) => label && label.match(re));
-        } else {
-            return options;
-        }
+            if (files && files.length > 0) {
+                // setOptions(files.map(fil => { return { label: fil.id?.toString() || '', value: fil.name } }));
+                options = files.map(fil => { return { value: fil.id?.toString() || '', label: fil.name } });
+                const re = new RegExp(filter, "i");
+                return options.filter(({ label }: any) => label && label.match(re));
+            } else {
+                return options;
+            }
     }
 
     const questionComp = React.useMemo(() => {
@@ -230,7 +230,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                 <label className="label">
                                     <span className="label-text">This exercise belongs to</span>
                                 </label>
-                                <Field as="select" name="course_id" onChange={(event: any) => onChange('courses_id', event.currentTarget.value)} className="select select-bordered">
+                                <Field as="select" value={exercise.courses_id} name="course_id" onChange={(event: any) => onChange('courses_id', event.currentTarget.value)} className="select select-bordered">
                                     <option value={-1}>Please choose</option>
                                     {
                                         courses.map((cou, index) => {
@@ -246,6 +246,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                 <Field
                                     component={MultiSelect}
                                     selectionLimit={1}
+                                    ClearSelectedIcon={<React.Fragment/>}
                                     options={[]}
                                     value={exercise.files}
                                     filterOptions={filterOptions}
@@ -256,20 +257,13 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                     name="trailers"
                                 />
                             </div>
-
-                            {/* <h2>Questions</h2> */}
-                            {/* <div className="flex flex-col md:flex-row md:gap-x-6 md:gap-y-2 gap-y-4">
-                        
-                    </div> */}
-                            <div className="col-span-2">
+                            {/* <div className="col-span-2">
                                 {questionComp}
-                            </div>
-
-
+                            </div> */}
                         </div>
-                        <button type="button" className="btn btn-primary" onClick={addNewQuestion}>Add More Questions</button>
+                        {/* <button type="button" className="btn btn-primary" onClick={addNewQuestion}>Add More Questions</button> */}
                         <div className="flex md:justify-end md:gap-x-4 justify-center gap-x-2">
-                            <button type="reset" className="btn btn-primary">Cancel</button>
+                            <button type="reset" onClick={(event)=>{router.back()}} className="btn btn-primary">Cancel</button>
                             <button type="submit" className={`btn btn-primary ${isSubmitting && 'loading btn-disabled'}`}>Save</button>
                         </div>
                     </Form>

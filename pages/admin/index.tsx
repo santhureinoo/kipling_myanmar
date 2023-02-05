@@ -122,8 +122,8 @@ const Home: NextPage = (result: any) => {
                 validate={(user: login_credential) => {
                   setBackendValidateMsg('');
                   const errors: any = {};
-                  if (!user.name) {
-                    errors.name = 'Username is required'
+                  if (!user.id) {
+                    errors.id = 'ID is required'
                   }
                   if (!user.password) {
                     errors.password = 'Password is required'
@@ -134,8 +134,9 @@ const Home: NextPage = (result: any) => {
                   const options = {
                     url: `/api/auth/login`,
                     params: {
-                      name: user.name,
-                      password: user.password
+                      id: user.id || '',
+                      password: user.password,
+                      admin: 'true'
                     }
                   };
 
@@ -175,7 +176,7 @@ const Home: NextPage = (result: any) => {
                     </div>
                     <div className="flex flex-col max-w-md space-y-2">
                       <div className="form-control">
-                        <Field type="text" placeholder="Username" name="name"
+                        <Field type="text" placeholder="Admin ID" name="id"
                           className={` ${errors.name ? 'input-error border-red' : 'border-black'} flex px-3 py-2 md:px-4 md:py-3 border-2 rounded-lg font-medium placeholder:font-normal`} />
                         <p className={`text-sm text-red-600 dark:text-red-500 ${errors.name ? 'block' : 'hidden'}`}>{errors.name}</p>
                       </div>

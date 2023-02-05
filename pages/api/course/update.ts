@@ -29,7 +29,7 @@ export default function handler(
 
     const course = sql.define<courses>({
         name: 'courses',
-        columns: ['id', 'photo', 'name', 'description', 'trailer_id']
+        columns: ['id', 'photo', 'name', 'description', 'trailer_id', 'status']
     });
 
     const query = course.update(

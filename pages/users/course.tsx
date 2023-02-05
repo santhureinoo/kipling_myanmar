@@ -8,7 +8,14 @@ import { courses, exercises, files } from "../../utilities/type";
 import { initialCourse, initialExercise } from "../../utilities/defaultData";
 import Script from 'next/script'
 import { dailyMotionAuth } from "../../utilities/db";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faQuestion } from "@fortawesome/free-solid-svg-icons";
+import { file } from "googleapis/build/src/apis/file";
+import rfdc from "rfdc";
+import { rejects } from "assert";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
+
+const cloneDeep = rfdc();
 
 const Course: NextPageWithLayout = () => {
 
@@ -17,8 +24,38 @@ const Course: NextPageWithLayout = () => {
     const [trailerFile, setTrailerFile] = React.useState<files>();
     const [selectedExerciseId, setSelectedExerciseId] = React.useState<string>();
     const [currentExercise, setCurrentExercise] = React.useState<exercises>();
+    const [thumbnailList, setThumbnailList] = React.useState<JSX.Element[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState(1);
+
+    const changeVideo = (index: number) => {
+        const options = {
+            url: '/api/dailymotion_auth',
+        };
+        CapacitorHttp.get(options).then((response: HttpResponse) => {
+            localStorage.setItem('daily_motion_token', JSON.stringify(response.data));
+            if (currentExercise && currentExercise.actualFiles) {
+                const options = {
+                    url: `https://api.dailymotion.com/video/${currentExercise.actualFiles[index].unique_name}?fields=private_id`,
+                    headers: { 'Authorization': `Bearer ${response.data.access_token}` },
+                };
+                CapacitorHttp.get(options).then((response: HttpResponse) => {
+                    const script = document.createElement("script");
+                    script.src = 'https://geo.dailymotion.com/player/xbcbr.js';
+                    script.setAttribute('data-video', response.data.private_id);
+                    script.async = true;
+                    script.onload = function () {
+                    };
+                    document.getElementById('trailer-dailymotion-player') && document.getElementById('trailer-dailymotion-player')?.replaceChildren(script);
+                }).catch(err => {
+
+                })
+            }
+
+        }).catch(err => {
+            localStorage.removeItem('daily_motion_token');
+        });
+    }
 
     const playVideo = (id: any) => {
         if (!id) {
@@ -40,7 +77,7 @@ const Course: NextPageWithLayout = () => {
                 script.async = true;
                 script.onload = function () {
                 };
-                document.getElementById('trailer-dailymotion-player')?.replaceChildren(script);
+                document.getElementById('trailer-dailymotion-player') && document.getElementById('trailer-dailymotion-player')?.replaceChildren(script);
             }).catch(err => {
 
             })
@@ -171,6 +208,46 @@ const Course: NextPageWithLayout = () => {
 
     }, [course, activeTab, currentExercise])
 
+    React.useEffect(() => {
+        if (currentExercise && currentExercise.actualFiles) {
+            const options = {
+                url: '/api/dailymotion_auth',
+            };
+            CapacitorHttp.get(options).then((response: HttpResponse) => {
+                localStorage.setItem('daily_motion_token', JSON.stringify(response.data));
+                const promiseList: Promise<JSX.Element>[] = [];
+                // Retrieve the thumnail one by one.
+                currentExercise && currentExercise.actualFiles?.map((file, index) => {
+                    const clonedThumbnailList = cloneDeep(thumbnailList);
+                    const url = `https://api.dailymotion.com/video/${file.unique_name}?fields=thumbnail_small_url`;
+                    const options = {
+                        url: url,
+                        headers: { 'Authorization': `Bearer ${response.data.access_token}` },
+                    };
+                    const prom = new Promise<JSX.Element>((resolved, rejects) => {
+                        CapacitorHttp.get(options).then((response: HttpResponse) => {
+                            resolved(
+                                <li onClick={(event) => changeVideo(index)}><div className="avatar"><div className="lg:w-24 sm:w-12 md:w-16 rounded flex items-center">{response.data.thumbnail_small_url ? <img src={response.data.thumbnail_small_url} /> : <FontAwesomeIcon className="w-20 h-[60px] text-[50px]" icon={faQuestion}></FontAwesomeIcon>}</div></div></li>
+                            )
+                        }).catch(err => {
+                            resolved(
+                                <li onClick={(event) => changeVideo(index)}><div className="avatar"><div className="lg:w-24 sm:w-12 md:w-16 rounded"> <FontAwesomeIcon icon={faQuestion}></FontAwesomeIcon></div></div></li>
+                            )
+                        })
+                    })
+                    promiseList.push(prom);
+                });
+
+                Promise.all(promiseList).then(res => {
+                    setThumbnailList(res);
+                })
+
+            }).catch(err => {
+                localStorage.removeItem('daily_motion_token');
+            });
+        }
+    }, [currentExercise]);
+
     const splitExerciseIds = React.useCallback(() => {
         if (course.exercise_ids) {
             return course.exercise_ids.split(',');
@@ -192,19 +269,29 @@ const Course: NextPageWithLayout = () => {
 
     return <div className="w-full px-4">
         <Script src="https://geo.dailymotion.com/libs/player/xbcbr.js"></Script>
-        <h1 className="text-lg">{course.name}</h1>
+        <div className="flex flex-row gap-x-6 items-center text-[30px] font-bold mb-8">
+            <FontAwesomeIcon icon={faArrowLeft} className='cursor-pointer' onClick={(event) => {
+                router.push('./dashboard')
+            }}></FontAwesomeIcon> <h1>{course.name}</h1>
+        </div>
         <div className="md:flex flex-row gap-x-4 gap-y-4">
-            <div className="md:w-1/2 w-full relative">
+            <div className="md:w-2/3 w-full relative">
                 <div id="trailer-dailymotion-player"></div>
+                <div className="flex justify-center mt-2">
+                    <ul id='thumbnail-container' className="menu menu-horizontal bg-base-100 rounded-box">
+                        {thumbnailList}
+                    </ul>
+                </div>
+
                 {/* <iframe className="w-full aspect-video" src="https://geo.dailymotion.com/player/xbcbr.html?video=k3QDtfJQww6SwhyEmot" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen frameBorder="0"></iframe> */}
                 {/* <iframe id="iframe-video" onLoad={onLoad} src={`https://drive.google.com/file/d/1gPE1ar6nhhB1vyH2HhlQttsqZv9oPOi3/preview`} sandbox="allow-scripts allow-forms allow-same-origin" className="w-full aspect-video" allow="autoplay" allowFullScreen></iframe>
                 <div className="removePopout">&nbsp;</div> */}
                 {/* <ReactPlayer controls={true} url={"https://www.dailymotion.com/video/k66icVLCcISSo9yEmot"} config={{ dailymotion: { params: { "sharing-enable": false, 'ui-start-screen-info': false } } }} /> */}
             </div>
-            <div className="md:w-1/2 w-full">
+            <div className="md:w-1/3 w-full">
                 <ul className="menu w-full border bg-base-100 menu-compact lg:menu-normal rounded-box">
                     <li className="bg-gray-200">
-                        <div className="flex justify-between">
+                        <div className="flex justify-between font-bold">
                             <a>
                                 {course.exercise_counts} Lessons
                             </a>
@@ -215,18 +302,27 @@ const Course: NextPageWithLayout = () => {
 
                     </li>
                     {course.exercise_names && course.exercise_names.split(',').map((name, index) => {
-                        return <li key={`exercise_name-${index}`}>
+                        return <li className="pl-4" key={`exercise_name-${index}`}>
                             <a onClick={() => {
                                 setSelectedExerciseId(splitExerciseIds()[index]);
-
                             }}>
                                 {name}
                             </a>
                         </li>
+                        // return <div className="collapse collapse-plus ">
+                        //     <input type="checkbox" />
+                        //     <div className="collapse-title text-xl font-medium">
+                        //         {name}
+                        //     </div>
+                        //     <div className="collapse-content">
+                        //         <p>hello</p>
+                        //     </div>
+                        // </div>
                     })}
                 </ul>
             </div>
         </div>
+
         <div className="tabs my-4">
             <a onClick={() => setActiveTab(1)} className={`tab tab-lifted ${activeTab === 1 && 'tab-active'}`}>Description</a>
             <a onClick={() => setActiveTab(2)} className={`tab tab-lifted ${activeTab === 2 && 'tab-active'}`}>Exercises</a>

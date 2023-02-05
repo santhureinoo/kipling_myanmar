@@ -3,15 +3,11 @@ import { datacatalog } from 'googleapis/build/src/apis/datacatalog';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Sql } from 'sql-ts';
 import excuteQuery from '../../../utilities/db';
-import { users } from '../../../utilities/type';
+import { exercises, exercises_files, users } from '../../../utilities/type';
 
-type Data = {
-    name: string
-}
-
-export default function handler(
+export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<Data>
+    res: NextApiResponse
 ) {
 
     //  Guard clause checks for first and last name,
@@ -22,23 +18,52 @@ export default function handler(
     // }
 
     // Get data submitted in request's body.
-    const body: users = JSON.parse(req.body);
+    const body: exercises = JSON.parse(req.body);
 
     //(optionally) set the SQL dialect
     const sql = new Sql('mysql');
 
-    const user = sql.define<users>({
-        name: 'users',
-        columns: ['id', 'name', 'password', 'status']
+    const exercise = sql.define<exercises>({
+        name: 'exercises',
+        columns: ['id', 'name', 'courses_id', 'status']
     });
 
-    const query = user.update(
-        body
-    ).where(user.id.equals(body.id)).toQuery();
+    const exercises_file = sql.define<exercises_files>({
+        name: 'exercises_files',
+        columns: ['files_id', 'exercises_id']
+    });
+
+    const clearJuntionQuery = exercises_file.delete().where(exercises_file.exercises_id.equals(body.id)).toQuery();
+
+    const query = exercise.update(
+        {
+            name: body.name,
+            courses_id: body.courses_id,
+            status: body.status
+        }
+    ).where(exercise.id.equals(body.id)).toQuery();
+
+    const fileQuery = (data: any[]) => {
+        return exercises_file.insert(data).toQuery();
+    };
+
     try {
-        excuteQuery({ query: query.text, values: query.values }).then((result: any) => {
-            return res.status(200).json({name:JSON.stringify(query)});
-        })
+        const result = await excuteQuery({ query: query.text, values: query.values });
+        await excuteQuery({ query: clearJuntionQuery.text, values: clearJuntionQuery.values });
+
+        if (body.files) {
+            let fileData = [];
+            for (let index = 0; index < body.files.length; index++) {
+                const file = body.files[index];
+                fileData.push({
+                    exercises_id: body.id,
+                    files_id: file.value,
+                })
+            }
+            await excuteQuery({ query: fileQuery(fileData).text, values: fileQuery(fileData).values });
+        }
+
+        return res.status(200).json({ "id": body.id, 'result': result });
 
     } catch (error: any) {
         return res.status(400).end();

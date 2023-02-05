@@ -19,10 +19,10 @@ export default function handler(
 
     const user = sql.define<users>({
         name: 'users',
-        columns: ['id', 'name', 'password', 'status']
+        columns: ['id', 'name', 'password', 'status', 'role']
     });
 
-    const query = user.select(user.star()).toQuery();
+    const query = user.select(user.star()).where(user.role.equals(0)).toQuery();
 
     try {
         excuteQuery({ query: query.text, values: query.values }).then((result: any) => {

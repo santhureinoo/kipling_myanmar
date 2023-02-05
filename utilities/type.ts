@@ -36,6 +36,7 @@ export namespace coursesFields {
     export type photo = string | null;
     export type name = string;
     export type description = string | null;
+    export type status = number;
     export type trailer_id = number | null;
 
 }
@@ -46,6 +47,7 @@ export interface courses {
     photo: coursesFields.photo;
     name: coursesFields.name;
     description: coursesFields.description;
+    status: coursesFields.status;
     trailer_id: coursesFields.trailer_id;
 
     //Custom 
@@ -58,6 +60,7 @@ export namespace exercisesFields {
     export type id = number | undefined;
     export type name = string;
     export type courses_id = string;
+    export type status = number;
 }
 
 export interface exercises {
@@ -65,6 +68,7 @@ export interface exercises {
     id?: exercisesFields.id;
     name: exercisesFields.name;
     courses_id?: exercisesFields.courses_id;
+    status: exercisesFields.status;
 
     //Custom
     questions?: questions[];
@@ -206,6 +210,7 @@ export interface multiple_select {
 }
 
 export interface login_credential {
+    id?: string;
     name: string;
     password: string;
     phoneNumber: string;

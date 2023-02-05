@@ -188,6 +188,7 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                                     component={MultiSelect}
                                     options={options}
                                     value={multiOptions}
+                                    ClearSelectedIcon={<React.Fragment/>}
                                     filterOptions={filterOptions}
                                     onChange={(val: any) => {
                                         onChange('course', val);
@@ -206,7 +207,7 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
 
                         </div>
                         <div className="flex md:justify-end md:gap-x-4 justify-center gap-x-2">
-                            <button type="reset" className="btn btn-primary">Cancel</button>
+                            <button type="reset" onClick={(event)=>{router.back()}} className="btn btn-primary">Cancel</button>
                             <button type="submit" className={`btn btn-primary ${isSubmitting && 'loading btn-disabled'}`}>Save</button>
                         </div>
 
