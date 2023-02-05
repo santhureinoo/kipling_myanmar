@@ -1,5 +1,6 @@
 import { CapacitorHttp, HttpResponse } from "@capacitor/core";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { RingLoader } from "react-spinners";
@@ -70,19 +71,19 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
                             <div className="flex-none hidden lg:block">
                                 <ul className="menu horizontal">
                                     <li>
-                                        <a href="/admin/groups" className="rounded-btn">Groups</a>
+                                        <Link href="/admin/groups" className="rounded-btn">Groups</Link>
                                     </li>
                                     <li>
-                                        <a href="/admin/users" className="rounded-btn">Users</a>
+                                        <Link href="/admin/users" className="rounded-btn">Users</Link>
                                     </li>
                                     <li>
-                                        <a href="/admin/courses" className="rounded-btn">Courses</a>
+                                        <Link href="/admin/courses" className="rounded-btn">Courses</Link>
                                     </li>
                                     <li>
-                                        <a href="/admin/exercises" className="rounded-btn">Exercises</a>
+                                        <Link href="/admin/exercises" className="rounded-btn">Exercises</Link>
                                     </li>
                                     <li>
-                                        <a href="/admin/files" className="rounded-btn">Files</a>
+                                        <Link href="/admin/files" className="rounded-btn">Files</Link>
                                     </li>
                                     <li>
                                         <button type="button" onClick={(event) => {
@@ -100,19 +101,19 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
                         <label htmlFor="my-drawer-3" className="drawer-overlay"></label>
                         <ul className="p-4 overflow-y-auto menu w-80 bg-base-100">
                             <li>
-                                <a href="/admin/groups" className="rounded-btn">Groups</a>
+                                <Link href="/admin/groups" className="rounded-btn">Groups</Link>
                             </li>
                             <li>
-                                <a href="/admin/users" className="rounded-btn">Users</a>
+                                <Link href="/admin/users" className="rounded-btn">Users</Link>
                             </li>
                             <li>
-                                <a href="/admin/courses" className="rounded-btn">Courses</a>
+                                <Link href="/admin/courses" className="rounded-btn">Courses</Link>
                             </li>
                             <li>
-                                <a href="/admin/exercises" className="rounded-btn">Exercises</a>
+                                <Link href="/admin/exercises" className="rounded-btn">Exercises</Link>
                             </li>
                             <li>
-                                <a href="/admin/files" className="rounded-btn">Files</a>
+                                <Link href="/admin/files" className="rounded-btn">Files</Link>
                             </li>
                             <li>
                                 <button type="button" onClick={(event) => {
