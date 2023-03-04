@@ -12,12 +12,22 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // env: {
+  //   'MYSQL_HOST': '127.0.0.1',
+  //   'MYSQL_PORT': '3306',
+  //   'MYSQL_DATABASE': 'kipling_db',
+  //   'MYSQL_USER': 'root',
+  //   'MYSQL_PASSWORD': '',
+  //   'REACT_APP_DAILYMOTION_SECRET': '7fd69e1811f3bf45d6443c449e225c834dccc570',
+  //   'REACT_APP_DAILYMOTION_KEY': '2a90bd7fee74fd813cab',
+  //   'IRON_SESSION_PASS': 'Cg1gpjtDf7xysym3TrkPP2Zj4MqUsdbR'
+  // },
   env: {
-    'MYSQL_HOST': '127.0.0.1',
-    'MYSQL_PORT': '3306',
-    'MYSQL_DATABASE': 'kipling_db',
+    'MYSQL_HOST': 'containers-us-west-119.railway.app',
+    'MYSQL_PORT': '7896',
+    'MYSQL_DATABASE': 'railway',
     'MYSQL_USER': 'root',
-    'MYSQL_PASSWORD': '',
+    'MYSQL_PASSWORD': 'LoxHDomr2m0kbXwt3zQ2',
     'REACT_APP_DAILYMOTION_SECRET': '7fd69e1811f3bf45d6443c449e225c834dccc570',
     'REACT_APP_DAILYMOTION_KEY': '2a90bd7fee74fd813cab',
     'IRON_SESSION_PASS': 'Cg1gpjtDf7xysym3TrkPP2Zj4MqUsdbR'
