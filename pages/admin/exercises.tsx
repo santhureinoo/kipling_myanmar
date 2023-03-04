@@ -2,29 +2,57 @@ import React, { ChangeEvent, ReactElement } from "react";
 import { NextPageWithLayout } from "../_app";
 import Layout from "./layout";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisV, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisV, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from "next/navigation";
 import { exercises } from "../../utilities/type";
 import { CapacitorHttp, HttpResponse } from "@capacitor/core";
 import rfdc from "rfdc";
+import ReactPaginate from "react-paginate";
 
 const cloneDeep = rfdc();
 
 const Exercises: NextPageWithLayout = () => {
     const router = useRouter();
     const [exercises, setExercises] = React.useState<exercises[]>([]);
+    const [searchName, setSearchName] = React.useState('');
+    const [pageTotal, setPageTotal] = React.useState(0);
+    const [pageIndex, setPageIndex] = React.useState(1);
 
-    React.useEffect(() => {
+    const getTotal = React.useCallback(() => {
+        const options = {
+            url: `/api/total/exercises`,
+            params: {
+                name: searchName,
+            }
+        };
+
+        CapacitorHttp.get(options).then(result => {
+            if (result.data && result.data.length > 0) {
+                setPageTotal(Math.ceil(result.data[0].total / 10));
+            }
+        })
+    }, [searchName])
+
+    const refatchExercise = React.useCallback(() => {
         const options = {
             url: `/api/exercise/list`,
+            params: {
+                name: searchName.toString(),
+                pageIndex: pageIndex.toString(),
+            },
         };
         CapacitorHttp.post(options).then((response: HttpResponse) => {
             setExercises(response.data);
         }).catch(err => {
             console.log(err);
         });
+    }, [searchName, pageIndex])
 
-    }, [])
+
+    React.useEffect(() => {
+        refatchExercise();
+        getTotal();
+    }, [pageIndex])
 
     const onDelete = (index: number) => {
         const clonedExercises = cloneDeep(exercises);
@@ -67,11 +95,26 @@ const Exercises: NextPageWithLayout = () => {
 
     return <React.Fragment>
         <div className="overflow-x-auto">
-            <button onClick={() => {
-                router.push('exercise/detail');
-            }} className="btn btn-primary float-right">
-                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> <span className="ml-2">Create Exam</span>
-            </button>
+            <div>
+                <input type="text" placeholder="Search by Name" value={searchName} onChange={val => setSearchName(val.currentTarget.value)} className="input input-bordered w-full max-w-xs mr-2" />
+                <button onClick={() => {
+                    if (pageIndex > 1) {
+                        setPageIndex(1);
+                    } else {
+                        refatchExercise();
+                        getTotal();
+                    }
+
+                }} className="btn btn-primary">
+                    <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
+                </button>
+                <button onClick={() => {
+                    router.push('exercise/detail');
+                }} className="btn btn-primary float-right">
+                    <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> <span className="ml-2">Create Exam</span>
+                </button>
+            </div>
+
             <table className="table w-full table-zebra">
                 <thead>
                     <tr>
@@ -117,6 +160,25 @@ const Exercises: NextPageWithLayout = () => {
 
                 </tbody>
             </table>
+            <div className="float-right mt-4">
+                <ReactPaginate
+                    containerClassName={"flex flex-row items-center btn-group gap-x-2"}
+                    pageClassName={"btn"}
+                    activeClassName={"bg-gray-400 hover:bg-gray-300 border-none"}
+                    previousClassName={"btn"}
+                    nextClassName={"btn"}
+                    breakClassName={"btn"}
+                    breakLabel="..."
+                    nextLabel=">"
+                    onPageChange={(selected) => {
+                        setPageIndex(selected.selected + 1);
+                    }}
+                    forcePage={pageIndex - 1}
+                    pageCount={pageTotal}
+                    previousLabel="<"
+                // renderOnZeroPageCount={<></>}
+                />
+            </div>
         </div>
     </React.Fragment>
 }

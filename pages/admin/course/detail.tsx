@@ -127,6 +127,7 @@ const CourseDetail: NextPageWithLayout = () => {
                 };
                 setSubmitting(true);
                 CapacitorHttp.post(options).then((response: HttpResponse) => {
+                    router.back();
                     setSubmitting(false);
                 }).catch(err => {
                     setSubmitting(false);
@@ -161,7 +162,7 @@ const CourseDetail: NextPageWithLayout = () => {
                                     component={MultiSelect}
                                     selectionLimit={1}
                                     options={options}
-                                    ClearSelectedIcon={<React.Fragment/>}
+                                    ClearSelectedIcon={<React.Fragment />}
                                     value={[selectedTrailer]}
                                     filterOptions={filterOptions}
                                     onChange={(val: any) => {
@@ -175,7 +176,7 @@ const CourseDetail: NextPageWithLayout = () => {
                             </div>
                         </div>
                         <div className="flex md:justify-end md:gap-x-4 justify-center gap-x-2">
-                            <button type="reset" onClick={(event)=>{router.back()}} className="btn btn-primary">Cancel</button>
+                            <button type="reset" onClick={(event) => { router.back() }} className="btn btn-primary">Cancel</button>
                             <button type="submit" className={`btn btn-primary ${isSubmitting && 'loading btn-disabled'}`}>Save</button>
                         </div>
 

@@ -9,7 +9,7 @@ type Data = {
     name: string
 }
 
-export default function handler(
+export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
@@ -22,12 +22,15 @@ export default function handler(
         columns: ['id', 'photo', 'name', 'description', 'trailer_id']
     });
 
-    const query = courses.select(courses.star()).toQuery();
+    let query = courses.select(courses.star()).toQuery();
+
+    if (req.query["name"]) {
+        query = courses.select(courses.star()).where(courses.name.like(`%${req.query["name"]}%`)).toQuery();
+    }
 
     try {
-        excuteQuery({ query: query.text, values: query.values }).then((result: any) => {
-            return res.status(200).json(result)
-        })
+        const result: any = await excuteQuery({ query: query.text, values: query.values });
+        return res.status(200).json(result)
 
     } catch (error: any) {
         return res.status(400).json(error)

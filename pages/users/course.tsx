@@ -177,27 +177,30 @@ const Course: NextPageWithLayout = () => {
                     {course.description}
                 </p>
             } else if (activeTab === 2) {
-                if (currentExercise && currentExercise.questions) {
-                    return currentExercise.questions.map((que, index) => {
-                        return <div key={`quest-${index}`}>
-                            <h4>
-                                {que.question}
-                            </h4>
-                            <div className="flex flex-col gap-y-2">
-                                {que.answers?.map((ans, ansIndex) => {
-                                    return <div key={`ans-${ansIndex}`} className="form-control">
-                                        <label className="label justify-start cursor-pointer space-x-2">
-                                            <input type="radio" name="radio-10" className="radio" checked />
-                                            <span className="label-text">{ans.answer}</span>
-                                        </label>
-                                    </div>
-                                })}
-                            </div>
-                        </div>
-                    })
-                } else {
-                    return <p> No Questions </p>
-                }
+                return <p>
+                    Work in progress!
+                </p>
+                // if (currentExercise && currentExercise.questions) {
+                //     return currentExercise.questions.map((que, index) => {
+                //         return <div key={`quest-${index}`}>
+                //             <h4>
+                //                 {que.question}
+                //             </h4>
+                //             <div className="flex flex-col gap-y-2">
+                //                 {que.answers?.map((ans, ansIndex) => {
+                //                     return <div key={`ans-${ansIndex}`} className="form-control">
+                //                         <label className="label justify-start cursor-pointer space-x-2">
+                //                             <input type="radio" name="radio-10" className="radio" checked />
+                //                             <span className="label-text">{ans.answer}</span>
+                //                         </label>
+                //                     </div>
+                //                 })}
+                //             </div>
+                //         </div>
+                //     })
+                // } else {
+                //     return <p> No Questions </p>
+                // }
 
             }
         } else {
@@ -326,7 +329,7 @@ const Course: NextPageWithLayout = () => {
         <div className="tabs my-4">
             <a onClick={() => setActiveTab(1)} className={`tab tab-lifted ${activeTab === 1 && 'tab-active'}`}>Description</a>
             <a onClick={() => setActiveTab(2)} className={`tab tab-lifted ${activeTab === 2 && 'tab-active'}`}>Exercises</a>
-            <a onClick={() => setActiveTab(3)} className={`tab tab-lifted ${activeTab === 3 && 'tab-active'}`}>Tab 3</a>
+            {/* <a onClick={() => setActiveTab(3)} className={`tab tab-lifted ${activeTab === 3 && 'tab-active'}`}>Tab 3</a> */}
         </div>
         <div className="w-full">
             {

@@ -58,5 +58,4 @@ export const ironOptions = {
   },
 };
 
-
 export const mysqlLastId = 'SELECT LAST_INSERT_ID() as ID';

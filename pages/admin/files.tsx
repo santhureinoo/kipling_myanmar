@@ -2,7 +2,7 @@ import React, { ChangeEvent, ReactElement, useRef } from "react";
 import { NextPageWithLayout } from "../_app";
 import Layout from "./layout";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisV, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisV, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { files } from "../../utilities/type";
 import { CapacitorHttp, HttpResponse } from "@capacitor/core";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { dailyMotionAuth } from "../../utilities/db";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ReactPaginate from "react-paginate";
 
 interface PresignedURL {
     progress_url: string;
@@ -27,11 +28,35 @@ const Files: NextPageWithLayout = () => {
     const [newFileName, setNewFileName] = React.useState("");
     const btnClose = useRef<HTMLLabelElement | null>(null);
     const [loading, setLoading] = React.useState(false);
+    const [pageTotal, setPageTotal] = React.useState(0);
+    const [pageIndex, setPageIndex] = React.useState(1);
+    const [searchName, setSearchName] = React.useState('');
     const router = useRouter();
 
-    const refetchFiles = () => {
+    const getTotal = React.useCallback(() => {
+        const options = {
+            url: `/api/total/files`,
+            params: {
+                name: searchName,
+                pageIndex: pageIndex.toString(),
+            }
+        };
+
+        CapacitorHttp.get(options).then(result => {
+            if (result.data && result.data.length > 0) {
+                setPageTotal(Math.ceil(result.data[0].total / 10));
+            }
+        })
+    }, [searchName, pageIndex])
+
+
+    const refetchFiles = React.useCallback(() => {
         const options = {
             url: `/api/file/list`,
+            params: {
+                name: searchName.toString(),
+                pageIndex: pageIndex.toString(),
+            },
         };
         CapacitorHttp.post(options).then((response: HttpResponse) => {
             setFiles(response.data);
@@ -39,7 +64,7 @@ const Files: NextPageWithLayout = () => {
         }).catch(err => {
             console.log(err);
         });
-    }
+    }, [searchName, pageIndex]);
 
     const pushToDailyMotion = (selectedfiles: FileList, token: any) => {
         setLoading(true);
@@ -81,6 +106,7 @@ const Files: NextPageWithLayout = () => {
                             toast.error(response.data.error.message);
                             setLoading(false);
                             refetchFiles();
+                            getTotal();
                             if (btnClose.current !== null) {
                                 btnClose.current.click();
                             }
@@ -116,6 +142,7 @@ const Files: NextPageWithLayout = () => {
 
                             CapacitorHttp.post(options).then((response: HttpResponse) => {
                                 refetchFiles();
+                                getTotal();
                                 if (btnClose.current !== null) {
                                     btnClose.current.click();
                                 }
@@ -220,12 +247,24 @@ const Files: NextPageWithLayout = () => {
 
     React.useEffect(() => {
         refetchFiles();
-    }, [])
+        getTotal();
+    }, [pageIndex])
+
 
     return <React.Fragment>
         <div className="overflow-x-auto">
             <ToastContainer />
-            <label htmlFor="file-upload" className="cursor-pointer btn btn-primary float-right"><FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> <span className="ml-2">Create File</span></label>
+            <div>
+                <input type="text" placeholder="Search by Name" value={searchName} onChange={val => setSearchName(val.currentTarget.value)} className="input input-bordered w-full max-w-xs mr-2" />
+                <button onClick={() => {
+                    refetchFiles();
+                    getTotal();
+                }} className="btn btn-primary">
+                    <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
+                </button>
+                <label htmlFor="file-upload" className="cursor-pointer btn btn-primary float-right"><FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> <span className="ml-2">Create File</span></label>
+            </div>
+
             <table className="table w-full table-zebra">
                 <thead>
                     <tr>
@@ -266,6 +305,25 @@ const Files: NextPageWithLayout = () => {
                     )}
                 </tbody>
             </table>
+            <div className="float-right mt-4">
+                <ReactPaginate
+                    containerClassName={"flex flex-row items-center btn-group gap-x-2"}
+                    pageClassName={"btn"}
+                    activeClassName={"bg-gray-400 hover:bg-gray-300 border-none"}
+                    previousClassName={"btn"}
+                    nextClassName={"btn"}
+                    breakClassName={"btn"}
+                    breakLabel="..."
+                    nextLabel=">"
+                    onPageChange={(selected) => {
+                        setPageIndex(selected.selected + 1);
+                    }}
+                    forcePage={pageIndex - 1}
+                    pageCount={pageTotal}
+                    previousLabel="<"
+                // renderOnZeroPageCount={<></>}
+                />
+            </div>
             {/* Put this part before </body> tag */}
             <input type="checkbox" id="file-upload" className="modal-toggle" />
             <label htmlFor="file-upload" className="modal modal-bottom sm:modal-middle cursor-pointer">

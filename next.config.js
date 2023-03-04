@@ -9,6 +9,9 @@ const nextConfig = {
   //   'MYSQL_USER': 'kpdummy_uscrewkept',
   //   'MYSQL_PASSWORD': 'e4077a75408ea303ba68b71ac305899794bcccb6',
   // },
+  images: {
+    unoptimized: true,
+  },
   env: {
     'MYSQL_HOST': '127.0.0.1',
     'MYSQL_PORT': '3306',

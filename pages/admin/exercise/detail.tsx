@@ -2,7 +2,7 @@ import React, { ReactElement } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { MultiSelect } from "react-multi-select-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faMinus, faClose } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faMinus, faClose, faAdd } from "@fortawesome/free-solid-svg-icons";
 import rfdc from "rfdc";
 import { answers, courses, exercises, files, multiple_select, questions } from "../../../utilities/type";
 import { Formik, Form, Field, FieldArray } from 'formik';
@@ -16,10 +16,11 @@ const cloneDeep = rfdc();
 
 const ExerciseDetail: NextPageWithLayout = () => {
 
-    // const [selected, setSelected] = React.useState([]);
+    const [selected, setSelected] = React.useState<multiple_select[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [courses, setCourses] = React.useState<courses[]>([]);
     const [exercise, setExercise] = React.useState<exercises>(initialExercise());
+    const firstTimeOption = React.useRef(true);
     const router = useRouter();
 
     React.useEffect(() => {
@@ -42,7 +43,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
                 setLoading(false);
-                setExercise(response.data)
+                setExercise(response.data);
             }).catch(err => {
                 setLoading(false);
                 setExercise(initialExercise());
@@ -51,6 +52,16 @@ const ExerciseDetail: NextPageWithLayout = () => {
             setLoading(false);
         }
     }, [router.isReady])
+
+    const initialOptions = React.useMemo(() => {
+        if (exercise.files && exercise.files.length > 0 && firstTimeOption.current) {
+            console.log('running', exercise.files);
+            firstTimeOption.current = false;
+            return cloneDeep(exercise.files);
+        } else {
+            return [];
+        }
+    }, [exercise.files])
 
     const addNewQuestion = () => {
         const clonedExercise = cloneDeep(exercise);
@@ -76,6 +87,26 @@ const ExerciseDetail: NextPageWithLayout = () => {
         }
         setExercise(clonedExercise);
     }
+
+    const setFilesInExercise = () => {
+        const clonedExercise = cloneDeep(exercise);
+        if (selected.length > 0) {
+            selected.forEach(ss => {
+                if (!clonedExercise.files?.find(ui => ui.value === ss.value)) {
+                    clonedExercise.files?.push(ss);
+                }
+            })
+            setExercise(clonedExercise);
+            setSelected([]);
+        }
+    }
+
+    const removeFile = (index: number) => {
+        const clonedExercise = cloneDeep(exercise);
+        clonedExercise.files && clonedExercise.files.splice(index, 1);
+        setExercise(clonedExercise);
+    }
+
 
     const onChange = (attribute: string, value: any) => {
         const clonedExercise = cloneDeep(exercise);
@@ -122,7 +153,6 @@ const ExerciseDetail: NextPageWithLayout = () => {
     }
 
     const filterOptions = async (options: any, filter: any) => {
-        // alert("filtering", filter);
 
         if (!filter) {
             return options;
@@ -133,14 +163,15 @@ const ExerciseDetail: NextPageWithLayout = () => {
         };
         const response = await CapacitorHttp.post(opt);
         const files: files[] = response.data;
-            if (files && files.length > 0) {
-                // setOptions(files.map(fil => { return { label: fil.id?.toString() || '', value: fil.name } }));
-                options = files.map(fil => { return { value: fil.id?.toString() || '', label: fil.name } });
-                const re = new RegExp(filter, "i");
-                return options.filter(({ label }: any) => label && label.match(re));
-            } else {
-                return options;
-            }
+        if (files && files.length > 0) {
+            // setOptions(files.map(fil => { return { label: fil.id?.toString() || '', value: fil.name } }));
+            options = files.map(fil => { return { value: fil.id?.toString() || '', label: fil.name } });
+            const re = new RegExp(filter, "i");
+            return options;
+            //.filter(({ label }: any) => label && label.match(re));
+        } else {
+            return options;
+        }
     }
 
     const questionComp = React.useMemo(() => {
@@ -211,6 +242,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
                     };
 
                     CapacitorHttp.post(options).then((response: HttpResponse) => {
+                        router.back();
                         setSubmitting(false);
                     }).catch(err => {
                         setSubmitting(false);
@@ -243,27 +275,75 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                 <label className="label">
                                     <span className="label-text">Content (video)</span>
                                 </label>
-                                <Field
-                                    component={MultiSelect}
-                                    selectionLimit={1}
-                                    ClearSelectedIcon={<React.Fragment/>}
-                                    options={[]}
-                                    value={exercise.files}
-                                    filterOptions={filterOptions}
-                                    onChange={(val: any) => {
-                                        onChange('File', val);
-                                    }}
-                                    labelledBy="Select"
-                                    name="trailers"
-                                />
+                                <div className="flex gap-x-2 w-full">
+                                    <Field
+                                        component={MultiSelect}
+                                        selectionLimit={1}
+                                        ClearSelectedIcon={<React.Fragment />}
+                                        className={'w-full'}
+                                        options={[]}
+                                        value={selected}
+                                        filterOptions={filterOptions}
+                                        onChange={(val: any) => {
+                                            if (val && val.length > 0)
+                                                setSelected(val);
+                                        }}
+                                        labelledBy="Select"
+                                        name="trailers"
+                                    />
+                                    <button type="button" className="btn btn-square" onClick={(event) => {
+                                        setFilesInExercise();
+                                    }}>
+                                        <FontAwesomeIcon icon={faAdd}></FontAwesomeIcon>
+                                    </button>
+                                </div>
+                                <div className="collapse">
+                                    <input type="checkbox" />
+                                    <div className="collapse-title text-xl font-medium">
+                                        Click me to show/hide content
+                                    </div>
+                                    <div className="collapse-content">
+                                        <table className="table w-full table-zebra">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>Remove?</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    exercise.files && exercise.files.map((file, index) => {
+                                                        return <tr key={index}>
+                                                            <td>
+                                                                {file.value}
+                                                            </td>
+                                                            <td>
+                                                                {file.label}
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" className="btn btn-square" onClick={(event) => {
+                                                                    removeFile(index);
+                                                                }}>
+                                                                    <FontAwesomeIcon icon={faClose}></FontAwesomeIcon>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    })
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
+
                             {/* <div className="col-span-2">
                                 {questionComp}
                             </div> */}
                         </div>
                         {/* <button type="button" className="btn btn-primary" onClick={addNewQuestion}>Add More Questions</button> */}
                         <div className="flex md:justify-end md:gap-x-4 justify-center gap-x-2">
-                            <button type="reset" onClick={(event)=>{router.back()}} className="btn btn-primary">Cancel</button>
+                            <button type="reset" onClick={(event) => { router.back() }} className="btn btn-primary">Cancel</button>
                             <button type="submit" className={`btn btn-primary ${isSubmitting && 'loading btn-disabled'}`}>Save</button>
                         </div>
                     </Form>

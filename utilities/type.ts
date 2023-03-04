@@ -116,12 +116,16 @@ export namespace groupsFields {
 }
 
 export interface groups {
-    id: groupsFields.id;
+    [key: string]: any;
+    id?: groupsFields.id;
     name: groupsFields.name;
     status: groupsFields.status;
 
-}
 
+    // Custom 
+    course_ids: multiple_select[];
+    user_ids: multiple_select[];
+}
 export namespace groups_coursesFields {
     export type groupId = number;
     export type courseId = number;

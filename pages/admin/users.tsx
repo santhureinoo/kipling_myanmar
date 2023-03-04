@@ -5,9 +5,10 @@ import { NextPageWithLayout } from "../_app";
 import Layout from "./layout";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
 import rfdc from "rfdc";
+import ReactPaginate from "react-paginate";
 
 // export async function getStaticProps(context: any) {
 //     let result;
@@ -32,17 +33,34 @@ const cloneDeep = rfdc();
 
 const Users: NextPageWithLayout = ({ result }: any) => {
     const [users, setUsers] = React.useState<users[]>([]);
+    const [pageTotal, setPageTotal] = React.useState(0);
     const [pageIndex, setPageIndex] = React.useState(1);
     const [loading, setLoading] = React.useState(false);
+    const [searchName, setSearchName] = React.useState('');
     const router = useRouter();
 
-    React.useEffect(() => {
-
-        setLoading(true);
-
+    const getTotal = React.useCallback(() => {
         const options = {
-            url: '/api/user/list',
-            params: { page: pageIndex.toString() },
+            url: `/api/total/users`,
+            params: {
+                name: searchName
+            }
+        };
+
+        CapacitorHttp.get(options).then(result => {
+            if (result.data && result.data.length > 0) {
+                setPageTotal(Math.ceil(result.data[0].total / 10));
+            }
+        })
+    }, [searchName])
+
+    const searchUsers = React.useCallback(() => {
+        const options = {
+            url: `/api/user/list`,
+            params: {
+                name: searchName.toString(),
+                pageIndex: pageIndex.toString(),
+            },
         };
 
         CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -52,7 +70,12 @@ const Users: NextPageWithLayout = ({ result }: any) => {
             setLoading(false);
             setUsers([]);
         })
-    }, []);
+    }, [searchName, pageIndex]);
+
+    React.useEffect(() => {
+        searchUsers();
+        getTotal();
+    }, [pageIndex]);
 
     const onChange = (index: number, attribute: string, value: any) => {
         setLoading(true);
@@ -90,13 +113,30 @@ const Users: NextPageWithLayout = ({ result }: any) => {
         })
     }
 
+
+
     return <React.Fragment>
         <div className="overflow-x-auto">
-            <button onClick={() => {
-                router.push('user/detail');
-            }} className="btn btn-primary float-right">
-                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> <span className="ml-2">Create User</span>
-            </button>
+            <div>
+                <input type="text" placeholder="Search by Name" value={searchName} onChange={val => setSearchName(val.currentTarget.value)} className="input input-bordered w-full max-w-xs mr-2" />
+                <button onClick={() => {
+                    if (pageIndex > 1) {
+                        setPageIndex(1);
+                    } else {
+                        searchUsers();
+                        getTotal();
+                    }
+
+                }} className="btn btn-primary">
+                    <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
+                </button>
+                <button onClick={() => {
+                    router.push('user/detail');
+                }} className="btn btn-primary float-right">
+                    <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> <span className="ml-2">Create User</span>
+                </button>
+            </div>
+
             <table className="table w-full table-zebra">
                 <thead>
                     <tr>
@@ -121,7 +161,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
                                 }} checked={user.status ? true : false} />
                             </td>
                             <td>
-                                <span onClick={(event)=>{
+                                <span onClick={(event) => {
                                     router.push(`user/detail?id=${user.id}`)
                                 }} className="cursor-pointer mr-2">Edit</span>
                                 {/* The button to open modal */}
@@ -143,6 +183,25 @@ const Users: NextPageWithLayout = ({ result }: any) => {
                     })}
                 </tbody>
             </table>
+            <div className="float-right mt-4">
+                <ReactPaginate
+                    containerClassName={"flex flex-row items-center btn-group gap-x-2"}
+                    pageClassName={"btn"}
+                    activeClassName={"bg-gray-400 hover:bg-gray-300 border-none"}
+                    previousClassName={"btn"}
+                    nextClassName={"btn"}
+                    breakClassName={"btn"}
+                    breakLabel="..."
+                    nextLabel=">"
+                    onPageChange={(selected) => {
+                        setPageIndex(selected.selected + 1);
+                    }}
+                    forcePage={pageIndex - 1}
+                    pageCount={pageTotal}
+                    previousLabel="<"
+                // renderOnZeroPageCount={<></>}
+                />
+            </div>
         </div>
     </React.Fragment>
 }

@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { datacatalog } from 'googleapis/build/src/apis/datacatalog';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Query, Sql } from 'sql-ts';
+import { Sql } from 'sql-ts';
 import excuteQuery from '../../../utilities/db';
-import { users } from '../../../utilities/type';
+import { groups, groups_courses, groups_users, users } from '../../../utilities/type';
 
 type Data = {
     name: string
@@ -17,31 +17,21 @@ export default async function handler(
     //(optionally) set the SQL dialect
     const sql = new Sql('mysql');
 
-    const user = sql.define<users>({
-        name: 'users',
-        columns: ['id', 'name', 'password', 'status', 'role']
-    });
-
-
-    let queryObj: Query<users>;
-
-    if (req.query["name"]) {
-        queryObj = user.select(user.star()).where(user.name.like(`%${req.query["name"]}%`)).where(user.role.equals(0));
-    } else {
-        queryObj = user.select(user.star()).where(user.role.equals(0));
-    }
+    let limitQuery = '';
 
     if (req.query["pageIndex"]) {
         let pageIndex = parseInt(req.query["pageIndex"] as string || '1');
-        queryObj.limit(10).offset((pageIndex - 1) * 10);
+        limitQuery = ` LIMIT 2 OFFSET ${(pageIndex - 1) * 2}`
     }
 
-    let query = queryObj.toQuery();
+    const query = {
+        text: `SELECT g.*, GROUP_CONCAT(gu.userId) as user_ids, GROUP_CONCAT(gc.courseId) as course_ids  FROM groups g LEFT JOIN groups_users gu ON g.id = gu.groupId LEFT JOIN groups_courses gc ON g.id = gc.groupId GROUP BY g.id ${limitQuery}`,
+        values: []
+    }
 
     try {
-        const result: any = await excuteQuery({ query: query.text, values: query.values })
+        const result: any = await excuteQuery({ query: query.text, values: query.values });
         return res.status(200).json(result);
-
     } catch (error: any) {
         return res.status(400).json(error)
     }

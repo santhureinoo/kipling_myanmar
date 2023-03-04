@@ -9,7 +9,7 @@ type Data = {
     name: string
 }
 
-export default function handler(
+export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
@@ -22,17 +22,25 @@ export default function handler(
         columns: ['id', 'name', 'unique_name', 'status']
     });
 
-    let query = file.select(file.star()).toQuery();
+    let queryObj = file.select(file.star());
 
     if (req.query["name"]) {
-        query = file.select(file.star()).where(file.name.like(`%${req.query["name"]}%`)).toQuery();
+        queryObj = file.select(file.star()).where(file.name.like(`%${req.query["name"]}%`));
     } else if (req.query["trailer"]) {
-        query = file.select(file.star()).where(file.id.equals(req.query["trailer"])).toQuery();
+        queryObj = file.select(file.star()).where(file.id.equals(req.query["trailer"]));
     }
+
+    if (req.query["pageIndex"]) {
+        let pageIndex = parseInt(req.query["pageIndex"] as string || '1');
+        queryObj.limit(10).offset((pageIndex - 1) * 10);
+    }
+
+    console.log(queryObj.toQuery());
+
+    const query = queryObj.toQuery();
     try {
-        excuteQuery({ query: query.text, values: query.values }).then((result: any) => {
-            return res.status(200).json(result)
-        })
+        const result: any = await excuteQuery({ query: query.text, values: query.values });
+        return res.status(200).json(result);
 
     } catch (error: any) {
         return res.status(400).json(error)

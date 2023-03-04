@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { answers, courses, exercises, files, multiple_select, questions, users } from './type';
+import { answers, courses, exercises, files, groups, multiple_select, questions, users } from './type';
 
 function pad(num: number) {
     let numStr = num.toString();
@@ -17,6 +17,16 @@ export const initialUser = (id: number) => {
         course_ids: '',
     } as users
 }
+
+export const initialGroup = () => {
+    return {
+        name: '',
+        status: 0,
+        course_ids: [],
+        user_ids: [],
+    } as groups
+}
+
 
 export const initialExercise = () => {
     return {
@@ -59,7 +69,7 @@ export const initialCourse = () => {
     } as courses
 }
 
-export const initialLogin = () =>{ 
+export const initialLogin = () => {
     return {
         name: '',
         password: '',

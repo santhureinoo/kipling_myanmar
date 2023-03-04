@@ -149,6 +149,7 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                     };
 
                     CapacitorHttp.post(options).then((response: HttpResponse) => {
+                        router.back();
                         setSubmitting(false);
                     }).catch(err => {
                         setSubmitting(false);
