@@ -26,6 +26,7 @@ const Files: NextPageWithLayout = () => {
     const [files, setFiles] = React.useState<files[]>([]);
     const [uploadedFiles, setUploadedFiles] = React.useState<FileList | null>();
     const [newFileName, setNewFileName] = React.useState("");
+    const [existingUploadedName, setExistingUploadedName] = React.useState("");
     const btnClose = useRef<HTMLLabelElement | null>(null);
     const [loading, setLoading] = React.useState(false);
     const [pageTotal, setPageTotal] = React.useState(0);
@@ -242,6 +243,30 @@ const Files: NextPageWithLayout = () => {
                 localStorage.removeItem('daily_motion_token');
             });
 
+        } else if (existingUploadedName) {
+            const currentFile: files = {
+                name: newFileName,
+                unique_name: existingUploadedName,
+                status: 0,
+            };
+
+            const options = {
+                url: `/api/file/create`,
+                data: currentFile,
+            };
+
+            CapacitorHttp.post(options).then((response: HttpResponse) => {
+                refetchFiles();
+                getTotal();
+                if (btnClose.current !== null) {
+                    btnClose.current.click();
+                }
+                setLoading(false);
+            }).catch(err => {
+                toast(err);
+            })
+        } else {
+            toast("Please upload or enter existing file name.")
         }
     }
 
@@ -328,12 +353,18 @@ const Files: NextPageWithLayout = () => {
             <input type="checkbox" id="file-upload" className="modal-toggle" />
             <label htmlFor="file-upload" className="modal modal-bottom sm:modal-middle cursor-pointer">
                 <label className="modal-box relative" htmlFor="">
-                    <h3 className="font-bold text-lg text-center pb-6">Select File!</h3>
+                    <h3 className="font-bold text-lg text-center pb-6">Select file or enter existing content name!</h3>
                     <div className="flex flex-col gap-y-2">
                         <input type="file" onChange={(event) => { setUploadedFiles(event.currentTarget.files); }} className="file-input file-input-bordered w-full" />
                         <div className="form-control w-full">
                             <label className="input-group">
-                                <span className="w-1/4">File Name</span>
+                                <span className="w-1/4">Uploaded file Name</span>
+                                <input type="text" placeholder="Enter file name" value={existingUploadedName} onChange={(event) => { setExistingUploadedName(event.currentTarget.value) }} className="input w-3/4 input-bordered" />
+                            </label>
+                        </div>
+                        <div className="form-control w-full">
+                            <label className="input-group">
+                                <span className="w-1/4">Display Name</span>
                                 <input type="text" placeholder="Enter file name" value={newFileName} onChange={(event) => { setNewFileName(event.currentTarget.value) }} className="input w-3/4 input-bordered" />
                             </label>
                         </div>
