@@ -78,10 +78,10 @@ const Groups: NextPageWithLayout = () => {
                                 {group.name}
                             </td>
                             <td>
-                                {group.user_ids?.length}
+                                {group.user_ids_string ? group.user_ids_string.split(',').length : 0}
                             </td>
                             <td>
-                                {group.course_ids?.length}
+                                {group.course_ids_string ? group.course_ids_string.split(',').length : 0}
                             </td>
                             <td>
                                 <input type="checkbox" className="toggle" onChange={(event) => onChange(event, index, 'status', group.status === 1 ? 0 : 1)} checked={group.status === 1 ? true : false} />

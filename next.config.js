@@ -23,11 +23,11 @@ const nextConfig = {
   //   'IRON_SESSION_PASS': 'Cg1gpjtDf7xysym3TrkPP2Zj4MqUsdbR'
   // },
   env: {
-    'MYSQL_HOST': 'containers-us-west-119.railway.app',
-    'MYSQL_PORT': '7896',
-    'MYSQL_DATABASE': 'railway',
-    'MYSQL_USER': 'root',
-    'MYSQL_PASSWORD': 'LoxHDomr2m0kbXwt3zQ2',
+    'MYSQL_HOST': 'a9b.h.filess.io',
+    'MYSQL_PORT': '3305',
+    'MYSQL_DATABASE': 'kiplingdb_almosthas',
+    'MYSQL_USER': 'kiplingdb_almosthas',
+    'MYSQL_PASSWORD': 'da4fe978ce7a543754e55fce063b0fc750ab8707',
     'REACT_APP_DAILYMOTION_SECRET': '7fd69e1811f3bf45d6443c449e225c834dccc570',
     'REACT_APP_DAILYMOTION_KEY': '2a90bd7fee74fd813cab',
     'IRON_SESSION_PASS': 'Cg1gpjtDf7xysym3TrkPP2Zj4MqUsdbR'

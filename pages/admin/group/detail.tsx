@@ -196,7 +196,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                 <div className="collapse">
                                     <input type="checkbox" />
                                     <div className="collapse-title text-xl font-medium">
-                                        Click me to show/hide content
+                                        Click me to show/hide students
                                     </div>
                                     <div className="collapse-content">
                                         <table className="table w-full table-zebra">
@@ -263,7 +263,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                     <div className="collapse">
                                         <input type="checkbox" />
                                         <div className="collapse-title text-xl font-medium">
-                                            Click me to show/hide content
+                                            Click me to show/hide courses
                                         </div>
                                         <div className="collapse-content">
                                             <table className="table w-full table-zebra">

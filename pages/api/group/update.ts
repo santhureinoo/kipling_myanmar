@@ -25,18 +25,18 @@ export default async function handler(
 
     const groups = sql.define<groups>({
         name: 'groups',
-        columns: ['id', 'name', 'status']
+        columns: ['id', 'name', 'status', 'created_at', 'updated_at']
     });
 
 
     const gc = sql.define<groups_courses>({
         name: 'groups_courses',
-        columns: ['groupId', 'courseId', 'status']
+        columns: ['groupId', 'courseId', 'status', 'created_at', 'updated_at']
     });
 
     const gu = sql.define<groups_users>({
         name: 'groups_users',
-        columns: ['groupId', 'userId', 'status']
+        columns: ['groupId', 'userId', 'status', 'created_at', 'updated_at']
     });
 
 
@@ -50,12 +50,14 @@ export default async function handler(
         return gu.insert(data).toQuery();
     }
 
-    const { course_ids, user_ids, ...editedBody } = body;
+    const { course_ids, user_ids, user_ids_string, course_ids_string, ...editedBody } = body;
 
     const query = groups.update(
         editedBody
     ).where(groups.id.equals(body.id)).toQuery();
 
+
+    console.log(query);
     try {
         const result: any = await excuteQuery({ query: query.text, values: query.values });
         if (body.course_ids) {

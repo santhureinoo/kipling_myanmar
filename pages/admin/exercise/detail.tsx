@@ -20,6 +20,8 @@ const ExerciseDetail: NextPageWithLayout = () => {
     const [loading, setLoading] = React.useState(false);
     const [courses, setCourses] = React.useState<courses[]>([]);
     const [exercise, setExercise] = React.useState<exercises>(initialExercise());
+    const [removedAnsId, setRemovedAnsId] = React.useState<string[]>([]);
+    const [removedQuestId, setRemovedQuestId] = React.useState<string[]>([]);
     const firstTimeOption = React.useRef(true);
     const router = useRouter();
 
@@ -83,6 +85,12 @@ const ExerciseDetail: NextPageWithLayout = () => {
     const removeAnswer = (questionId: number, index: number) => {
         const clonedExercise = cloneDeep(exercise);
         if (clonedExercise.questions && clonedExercise.questions[questionId]) {
+            const answers = clonedExercise.questions[questionId].answers || [];
+            if (answers.length > index && !removedAnsId.includes(answers[index].id || '0')) {
+                const clonedRQI = cloneDeep(removedAnsId);
+                clonedRQI.push(answers[index].id || '0');
+                setRemovedAnsId(clonedRQI);
+            }
             clonedExercise.questions[questionId].answers?.splice(index, 1);
         }
         setExercise(clonedExercise);
@@ -123,7 +131,13 @@ const ExerciseDetail: NextPageWithLayout = () => {
         const clonedExercise = cloneDeep(exercise);
 
         if (clonedExercise.questions && clonedExercise.questions.length > index) {
-            delete clonedExercise.questions[index];
+            if (clonedExercise.questions && clonedExercise.questions[index]) {
+                const currentQuestion = clonedExercise.questions[index];
+                const clonedRQI = cloneDeep(removedQuestId);
+                clonedRQI.push(currentQuestion.id || '0');
+                setRemovedQuestId(clonedRQI);
+            }
+            clonedExercise.questions.splice(index,1);
         }
 
         setExercise(clonedExercise);
@@ -209,7 +223,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                     <input type="text" placeholder="username" value={ans.answer} onChange={event => changeAnswer(index, ansIndex, 'answer', event.currentTarget.value)} className="input input-bordered" />
                                     <label className="cursor-pointer label">
                                         <span className="label-text mr-2">Correct?</span>
-                                        <input type="checkbox" className="checkbox checkbox-lg" value={ans.valid} onChange={event => changeAnswer(index, ansIndex, 'valid', event.currentTarget.value)} />
+                                        <input type="checkbox" className="checkbox checkbox-lg" checked={ans.valid === 1 ? true : false} onChange={event => changeAnswer(index, ansIndex, 'valid', event.currentTarget.checked ? 1 : 0)} />
                                     </label>
                                 </div>
                                 <div className="btn-group gap-x-4">
@@ -238,7 +252,11 @@ const ExerciseDetail: NextPageWithLayout = () => {
                 onSubmit={(_, { setSubmitting }) => {
                     const options = {
                         url: `/api/exercise/${router.query['id'] ? 'update' : 'create'}`,
-                        data: exercise,
+                        data: {
+                            exercise: exercise,
+                            remQuest: removedQuestId,
+                            remAns: removedAnsId,
+                        },
                     };
 
                     CapacitorHttp.post(options).then((response: HttpResponse) => {
@@ -300,7 +318,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                 <div className="collapse">
                                     <input type="checkbox" />
                                     <div className="collapse-title text-xl font-medium">
-                                        Click me to show/hide content
+                                        Click me to show/hide videos
                                     </div>
                                     <div className="collapse-content">
                                         <table className="table w-full table-zebra">
@@ -337,11 +355,11 @@ const ExerciseDetail: NextPageWithLayout = () => {
                                 </div>
                             </div>
 
-                            {/* <div className="col-span-2">
+                            <div className="col-span-2">
                                 {questionComp}
-                            </div> */}
+                            </div>
                         </div>
-                        {/* <button type="button" className="btn btn-primary" onClick={addNewQuestion}>Add More Questions</button> */}
+                        <button type="button" className="btn btn-primary" onClick={addNewQuestion}>Add More Questions</button>
                         <div className="flex md:justify-end md:gap-x-4 justify-center gap-x-2">
                             <button type="reset" onClick={(event) => { router.back() }} className="btn btn-primary">Cancel</button>
                             <button type="submit" className={`btn btn-primary ${isSubmitting && 'loading btn-disabled'}`}>Save</button>

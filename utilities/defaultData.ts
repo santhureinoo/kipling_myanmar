@@ -7,9 +7,9 @@ function pad(num: number) {
     return numStr;
 }
 
-export const initialUser = (id: number) => {
+export const initialUser = () => {
     return {
-        id: `KPU-${pad(id)}`,
+        id: `New`,
         name: '',
         password: '',
         status: 0,
@@ -53,7 +53,7 @@ export const initialAnswer = (id: number, questionId: number) => {
     return {
         id: `A-${pad(id)}`,
         type: 0,
-        question_id: questionId,
+        question_id: questionId.toString(),
         answer: '',
         valid: 0,
         explanation: '',

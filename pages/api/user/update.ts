@@ -25,7 +25,7 @@ export default async function handler(
 
     const user = sql.define<users>({
         name: 'users',
-        columns: ['id', 'name', 'password', 'status', 'phoneNumber']
+        columns: ['id', 'name', 'password', 'status', 'phoneNumber', 'isNew', 'role']
     });
 
     const uc = sql.define<users_courses>({
@@ -40,6 +40,8 @@ export default async function handler(
     }
 
     const { course_ids, course_names, ...editedBody } = body;
+
+    editedBody.isNew = 0;
 
     const query = user.update(
         editedBody

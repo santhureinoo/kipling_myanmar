@@ -9,7 +9,7 @@ import { initialCourse, initialExercise } from "../../utilities/defaultData";
 import Script from 'next/script'
 import { dailyMotionAuth } from "../../utilities/db";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faQuestion } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCheck, faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { file } from "googleapis/build/src/apis/file";
 import rfdc from "rfdc";
 import { rejects } from "assert";
@@ -27,6 +27,8 @@ const Course: NextPageWithLayout = () => {
     const [thumbnailList, setThumbnailList] = React.useState<JSX.Element[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState(1);
+    const [checkedAnswerList, setCheckedAnswerList] = React.useState<string[]>([]);
+    const [showCorrectAnswers, setShowCorrectAnswers] = React.useState(false);
 
     const changeVideo = (index: number) => {
         const options = {
@@ -107,6 +109,54 @@ const Course: NextPageWithLayout = () => {
         // }
     }
 
+    const checkAnswer = (questId: number, answerId: number): void => {
+        const clonedCheckedAnswerList = cloneDeep(checkedAnswerList);
+        const index = clonedCheckedAnswerList.indexOf(`${questId}-${answerId}`);
+        if (index !== -1) {
+            clonedCheckedAnswerList.splice(index, 1);
+        } else {
+            clonedCheckedAnswerList.push(`${questId}-${answerId}`);
+        }
+
+        setCheckedAnswerList(clonedCheckedAnswerList);
+    }
+
+    const showResult = (): void => {
+        if (currentExercise && currentExercise.questions && currentExercise.questions.length > 0) {
+            checkedAnswerList.forEach(checkedAnswer => {
+                const [questId, ansId] = checkedAnswer.split('-').map(dat => parseInt(dat));
+                if (currentExercise.questions) {
+                    const answerList = currentExercise.questions[questId].answers;
+                    if (answerList) {
+                        const answerObj = answerList[ansId];
+
+                    }
+                }
+            })
+        }
+    }
+
+    const getQuestionColor = (questionId: number) => {
+        if (currentExercise && showCorrectAnswers && currentExercise.questions) {
+            const answerList = currentExercise.questions[questionId].answers;
+            let isFound = false;
+            checkedAnswerList.forEach(chkAns => {
+                const [questId, ansId] = chkAns.split('-').map(ind => parseInt(ind));
+                if (questId === questionId) {
+                    if (answerList && answerList[ansId].valid) {
+                        isFound = true;
+                    }
+                }
+            })
+
+            return isFound ? 'text-green-400' : 'text-red-400';
+        } else {
+            return `text-black`;
+        }
+
+        // return showCorrectAnswers ? (`text-green-400`) : `text-black`
+    }
+
     React.useEffect(() => {
         setLoading(true);
         if (router.query['id']) {
@@ -177,30 +227,59 @@ const Course: NextPageWithLayout = () => {
                     {course.description}
                 </p>
             } else if (activeTab === 2) {
-                return <p>
-                    Work in progress!
-                </p>
-                // if (currentExercise && currentExercise.questions) {
-                //     return currentExercise.questions.map((que, index) => {
-                //         return <div key={`quest-${index}`}>
-                //             <h4>
-                //                 {que.question}
-                //             </h4>
-                //             <div className="flex flex-col gap-y-2">
-                //                 {que.answers?.map((ans, ansIndex) => {
-                //                     return <div key={`ans-${ansIndex}`} className="form-control">
-                //                         <label className="label justify-start cursor-pointer space-x-2">
-                //                             <input type="radio" name="radio-10" className="radio" checked />
-                //                             <span className="label-text">{ans.answer}</span>
+                // return <div className="max-w-sm gap-y-2">
+                //     {
+                //         course.questions && course.questions.map(quest => {
+                //             return <div>
+                //                 <h1>
+                //                     Question
+                //                 </h1>
+                //                 <div className="w-2/3 ml-auto">
+                //                     <div className="form-control">
+                //                         <label className="label cursor-pointer">
+                //                             <span className="label-text">Remember me</span>
+                //                             <input type="checkbox" checked={true} className="checkbox" />
                 //                         </label>
                 //                     </div>
-                //                 })}
+                //                 </div>
                 //             </div>
-                //         </div>
-                //     })
-                // } else {
-                //     return <p> No Questions </p>
-                // }
+                //         })
+                //     }
+
+                // </div>
+                if (currentExercise && currentExercise.questions && currentExercise.questions.length > 0) {
+                    return <React.Fragment>
+                        {currentExercise.questions.map((que, index) => {
+                            return <div key={`quest-${index}`} className="gap-y-2">
+                                <h4 className={getQuestionColor(index)}>
+                                    {que.question}
+                                </h4>
+                                <div className="flex flex-col gap-y-1">
+                                    {que.answers?.map((ans, ansIndex) => {
+                                        return <div key={`ans-${ansIndex}`} className="form-control">
+                                            <label className="label justify-start cursor-pointer space-x-2">
+                                                <input type="checkbox" name="answers" className="checkbox" onChange={(e) => {
+                                                    checkAnswer(index, ansIndex);
+                                                }} checked={
+                                                    checkedAnswerList.includes(`${index}-${ansIndex}`) ? true : false
+                                                } />
+                                                <span className="label-text">{ans.answer}</span>
+                                                {ans.valid && showCorrectAnswers ? <FontAwesomeIcon id={`${index}-${ansIndex}`} icon={faCheck}></FontAwesomeIcon> : <></>}
+                                            </label>
+                                        </div>
+                                    })}
+                                </div>
+                            </div>
+                        })}
+                        <div className="flex justify-center gap-x-2">
+                            <button type="button" className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg btn-success" onClick={e => { setShowCorrectAnswers(true) }}>Show Result</button>
+                            <button type="button" className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg btn-info" onClick={e => { setShowCorrectAnswers(false) }}>Reset</button>
+                        </div>
+
+                    </React.Fragment>
+                } else {
+                    return <p> No Questions </p>
+                }
 
             }
         } else {
@@ -209,7 +288,7 @@ const Course: NextPageWithLayout = () => {
             </p >
         }
 
-    }, [course, activeTab, currentExercise])
+    }, [course, activeTab, currentExercise, checkedAnswerList, showCorrectAnswers])
 
     React.useEffect(() => {
         if (currentExercise && currentExercise.actualFiles) {

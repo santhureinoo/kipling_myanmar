@@ -18,14 +18,20 @@ export default async function handler(
     const sql = new Sql('mysql');
 
     let limitQuery = '';
+    let searchByNameQuery = '';
 
     if (req.query["pageIndex"]) {
         let pageIndex = parseInt(req.query["pageIndex"] as string || '1');
         limitQuery = ` LIMIT 2 OFFSET ${(pageIndex - 1) * 2}`
     }
 
+    if (req.query["name"]) {
+        searchByNameQuery = ` WHERE name Like '%${req.query['name']}%'`;
+    }
+
+
     const query = {
-        text: `SELECT g.*, GROUP_CONCAT(gu.userId) as user_ids, GROUP_CONCAT(gc.courseId) as course_ids  FROM groups g LEFT JOIN groups_users gu ON g.id = gu.groupId LEFT JOIN groups_courses gc ON g.id = gc.groupId GROUP BY g.id ${limitQuery}`,
+        text: `SELECT g.*, GROUP_CONCAT(gu.userId) as user_ids_string, GROUP_CONCAT(gc.courseId) as course_ids_string  FROM groups g LEFT JOIN groups_users gu ON g.id = gu.groupId LEFT JOIN groups_courses gc ON g.id = gc.groupId ${searchByNameQuery} GROUP BY g.id ${limitQuery}`,
         values: []
     }
 

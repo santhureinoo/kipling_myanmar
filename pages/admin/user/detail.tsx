@@ -5,9 +5,9 @@ import { CapacitorHttp, HttpResponse } from "@capacitor/core";
 import { courses, multiple_select, users } from "../../../utilities/type";
 import { initialUser } from "../../../utilities/defaultData";
 import rfdc from "rfdc";
-import excuteQuery, { getUserSQLObj } from "../../../utilities/db";
 import { Formik, Form, Field } from 'formik';
 import { MultiSelect } from "react-multi-select-component";
+import * as gp from 'generate-password';
 import Layout from "../layout";
 
 const cloneDeep = rfdc();
@@ -17,24 +17,25 @@ const options = [
     { label: "Strawberry 🍓", value: "strawberry", disabled: true },
 ];
 
-export async function getStaticProps(context: any) {
+// export async function getStaticProps(context: any) {
 
-    const userSql = getUserSQLObj();
-    const totalQuery = userSql.select(userSql.count()).toQuery();
-    const countObj: any = await excuteQuery({ query: totalQuery.text });
+//     const userSql = getUserSQLObj();
+//     const totalQuery = userSql.select(userSql.count()).toQuery();
+//     const countObj: any = await excuteQuery({ query: totalQuery.text });
 
-    return {
-        props: {
-            total: JSON.stringify(countObj && countObj.length > 0 ? countObj[0].users_count : 0)
-        }, // will be passed to the page component as props
-    }
-}
+//     return {
+//         props: {
+//             total: JSON.stringify(countObj && countObj.length > 0 ? countObj[0].users_count : 0)
+//         }, // will be passed to the page component as props
+//     }
+// }
 
-const UserDetail: NextPageWithLayout = ({ total }: any) => {
+const UserDetail: NextPageWithLayout = () => {
 
-    const [user, setUser] = React.useState<users>(initialUser(parseInt(total) + 1));
+    const [user, setUser] = React.useState<users>(initialUser());
     const [loading, setLoading] = React.useState(false);
     const [options, setOptions] = React.useState<{ label: string | null, value: any }[]>([]);
+    const success_create = React.useRef<HTMLLabelElement | null>(null);
     const router = useRouter();
 
     React.useEffect(() => {
@@ -49,7 +50,7 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                 setUser(response.data);
             }).catch(err => {
                 setLoading(false);
-                setUser(initialUser(total));
+                setUser(initialUser);
             })
         } else {
             setLoading(false);
@@ -67,9 +68,6 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                 }
             })
         }
-
-        console.log(result);
-
         return result;
     }, [user.course_names, user.course_ids])
 
@@ -114,7 +112,6 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
         const response = await CapacitorHttp.post(opt);
         const courses: courses[] = response.data;
         if (courses && courses.length > 0) {
-            // setOptions(courses.map(cou => { return { label: cou.id?.toString() || '', value: cou.name } }));
             options = courses.map(cou => { return { value: cou.id?.toString() || '', label: cou.name } });
             const re = new RegExp(filter, "i");
             return options.filter(({ label }: any) => label && label.match(re));
@@ -123,8 +120,36 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
         }
     }
 
+    const setRandomPassword = () => {
+        const clonedUser = cloneDeep(user);
+        clonedUser.password = gp.generate({
+            length: 10,
+            numbers: true,
+            lowercase: true,
+            uppercase: true,
+            strict: true
+        });
+        setUser(clonedUser);
+
+    }
+
     return <React.Fragment>
         <div className="flex w-full min-h-screen bg-base-200">
+            {/* The button to open modal */}
+            <label htmlFor="success-create" className="btn hidden" ref={success_create}>open modal</label>
+
+            {/* Put this part before </body> tag */}
+            <input type="checkbox" id="success-create" className="modal-toggle" />
+            <div className="modal modal-bottom sm:modal-middle">
+                <div className="modal-box">
+                    <h3 className="font-bold text-lg">User account is registered successfully!</h3>
+                    <p className="pt-4">User ID  : {user.id}</p>
+                    <p className="pt-2">Password : {user.password}</p>
+                    <div className="modal-action">
+                        <label htmlFor="success-create" className="btn" onClick={(e) => router.back()}>Close and retun to List</label>
+                    </div>
+                </div>
+            </div>
             <Formik
                 initialValues={user}
                 validate={() => {
@@ -149,7 +174,15 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                     };
 
                     CapacitorHttp.post(options).then((response: HttpResponse) => {
-                        router.back();
+                        if (!router.query['id'] && success_create.current) {
+                            const clonedUser = cloneDeep(user);
+                            clonedUser.password = response.data.password;
+                            clonedUser.id = response.data.id;
+                            setUser(clonedUser);
+                            success_create.current.click();
+                        } else {
+                            router.back();
+                        }
                         setSubmitting(false);
                     }).catch(err => {
                         setSubmitting(false);
@@ -168,7 +201,7 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                             </div>
                             <div className="form-control col-span-2">
                                 <label className="label">
-                                    <span className="label-text">Password</span>
+                                    <span className="label-text">Password <button type="button" onClick={e => setRandomPassword()} className="btn btn-xs px-2">Generate random password</button></span>
                                 </label>
                                 <Field id="password" name="password" type="text" onChange={(event: any) => { onChange('password', event.currentTarget.value) }} value={user.password} placeholder="password" className={` ${errors.password ? 'input-error' : ''} input input-bordered`} />
                                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.password}</p>
@@ -189,7 +222,7 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
                                     component={MultiSelect}
                                     options={options}
                                     value={multiOptions}
-                                    ClearSelectedIcon={<React.Fragment/>}
+                                    ClearSelectedIcon={<React.Fragment />}
                                     filterOptions={filterOptions}
                                     onChange={(val: any) => {
                                         onChange('course', val);
@@ -208,7 +241,7 @@ const UserDetail: NextPageWithLayout = ({ total }: any) => {
 
                         </div>
                         <div className="flex md:justify-end md:gap-x-4 justify-center gap-x-2">
-                            <button type="reset" onClick={(event)=>{router.back()}} className="btn btn-primary">Cancel</button>
+                            <button type="reset" onClick={(event) => { router.back() }} className="btn btn-primary">Cancel</button>
                             <button type="submit" className={`btn btn-primary ${isSubmitting && 'loading btn-disabled'}`}>Save</button>
                         </div>
 

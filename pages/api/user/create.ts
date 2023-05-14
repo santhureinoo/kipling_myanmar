@@ -3,6 +3,7 @@ import { datacatalog } from 'googleapis/build/src/apis/datacatalog';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Sql } from 'sql-ts';
 import excuteQuery from '../../../utilities/db';
+import * as short from 'short-uuid';
 import { users, users_courses } from '../../../utilities/type';
 
 export default async function handler(
@@ -18,7 +19,7 @@ export default async function handler(
 
     const user = sql.define<users>({
         name: 'users',
-        columns: ['id', 'name', 'password', 'status', 'phoneNumber']
+        columns: ['id', 'name', 'password', 'status', 'phoneNumber', 'isNew']
     });
 
 
@@ -38,7 +39,7 @@ export default async function handler(
         text: "SELECT CONCAT('KPU-', lpad(count(*)+1, 2, 0)) as newID FROM users;",
     }
     const query = (id: any) => {
-        return user.insert(user.id.value(id), user.status.value(body.status), user.name.value(body.name), user.password.value(body.password), user.phoneNumber.value(body.phoneNumber)).toQuery();
+        return user.insert(user.id.value(id), user.status.value(body.status), user.name.value(body.name), user.password.value(body.password), user.phoneNumber.value(body.phoneNumber), user.isNew.value(1)).toQuery();
     }
 
     const clearJuntionQuery = uc.delete().where(uc.users_id.equals(body.id)).toQuery();
@@ -47,9 +48,9 @@ export default async function handler(
     }
 
     try {
-        const totalResult: any = await excuteQuery({ query: totalQuery.text });
-        const totalID = totalResult[0].newID;
-        const result: any = await excuteQuery({ query: query(totalID).text, values: query(totalID).values });
+        // const totalResult: any = await excuteQuery({ query: totalQuery.text });
+        const totalID = short.generate();
+        await excuteQuery({ query: query(totalID).text, values: query(totalID).values });
         if (body.course_ids) {
             await excuteQuery({ query: clearJuntionQuery.text, values: clearJuntionQuery.values });
             const data = body.course_ids.split(',').map(id => {
@@ -61,7 +62,10 @@ export default async function handler(
             await excuteQuery({ query: createJuntionQuery(data).text, values: createJuntionQuery(data).values });
         }
 
-        return res.status(200).json(result)
+        return res.status(200).json({
+            id: totalID,
+            password: body.password,
+        })
 
     } catch (error: any) {
         return res.status(400).json(error)

@@ -99,7 +99,7 @@ const Home: NextPage = (result: any) => {
                 <button onClick={(event) => { setIsLogin(!isLogin) }}
                   className="inline-block flex-none px-4 py-3 border-2 rounded-lg font-medium border-black bg-black text-white">{isLogin ? `Contact Us` : `Sign In`}</button> */}
               </div>
-              <p className="font-medium">© 2022 Company</p>
+              <p className="font-medium">© 2023 Education System</p>
             </div>
 
             {/* LOGIN */}

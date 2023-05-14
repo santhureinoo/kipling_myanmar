@@ -19,7 +19,7 @@ export default async function handler(
     }
 
     if (req.query['name']) {
-        externalQuery += ` where name like '%${req.query["name"]}%'`
+        externalQuery += ` AND name like '%${req.query["name"]}%'`
     }
 
     const totalQuery = {

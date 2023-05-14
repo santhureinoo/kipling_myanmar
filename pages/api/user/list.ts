@@ -19,7 +19,7 @@ export default async function handler(
 
     const user = sql.define<users>({
         name: 'users',
-        columns: ['id', 'name', 'password', 'status', 'role']
+        columns: ['id', 'name', 'password', 'status', 'role', 'isNew']
     });
 
 

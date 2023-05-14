@@ -4,7 +4,6 @@ import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
 import excuteQuery from '../utilities/db';
 import React, { useRef } from 'react';
-import axios, { isCancel, AxiosError } from 'axios';
 import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
 import { useRouter } from 'next/navigation';
 import { NextPage } from 'next';
@@ -44,7 +43,7 @@ const Home: NextPage = (result: any) => {
   const router = useRouter();
   const [isLogin, setIsLogin] = React.useState(true);
   const [backendValidateMsg, setBackendValidateMsg] = React.useState('');
-  const [userObj] = React.useState<login_credential>(initialLogin);
+  const [userObj, setUserObj] = React.useState<login_credential>(initialLogin);
 
   // React.useEffect(() => {
   //   // let origin = Capacitor.isNative ? publicRuntimeConfig.api_origin : "";
@@ -72,6 +71,8 @@ const Home: NextPage = (result: any) => {
 
 
   const togglePart = React.useMemo(() => {
+    // alert(userObj.name);
+    console.log(userObj);
     if (isLogin) {
       return <Formik
         initialValues={userObj}
@@ -150,7 +151,7 @@ const Home: NextPage = (result: any) => {
                   aria-label="Loading Spinner"
                   data-testid="loader"
                 />Sign in</button>
-              <p className="text-lg text-center lg:hidden block">New user?<button onClick={(event) => setIsLogin(false)} className='pl-2 text-sky-600 cursor-pointer'>Register Now <FontAwesomeIcon icon={faUpRightFromSquare}></FontAwesomeIcon></button></p>
+              {/* <p className="text-lg text-center lg:hidden block">New user?<button onClick={(event) => setIsLogin(false)} className='pl-2 text-sky-600 cursor-pointer'>Register Now <FontAwesomeIcon icon={faUpRightFromSquare}></FontAwesomeIcon></button></p> */}
               <p className={`text-sm text-center text-red-600 dark:text-red-500 ${backendValidateMsg ? 'block' : 'hidden'}`}>{backendValidateMsg}</p>
               {/* <div className="flex justify-center items-center">
               <span className="w-full border border-black"></span>
@@ -207,8 +208,13 @@ const Home: NextPage = (result: any) => {
             if (response.data.success !== undefined && response.data.success === false) {
               setBackendValidateMsg(response.data.message);
             } else {
+              // setUserObj({
+              //   id: response.data.id,
+              //   password: user.password,
+              // } as login_credential);
               // router.push('./users/dashboard');
               setIsLogin(true);
+              router.refresh();
             }
           }).catch(err => {
             setSubmitting(false);
@@ -254,7 +260,7 @@ const Home: NextPage = (result: any) => {
         </Form>)}
       </Formik>
     }
-  }, [isLogin, backendValidateMsg])
+  }, [isLogin, backendValidateMsg, userObj])
 
   return (
     <>
@@ -280,11 +286,11 @@ const Home: NextPage = (result: any) => {
                 <div className='space-y-5'>
                   <h1 className="lg:text-3xl xl:text-5xl xl:leading-snug font-extrabold">Enter your account and discover new
                     experiences</h1>
-                  <p className="text-lg">{isLogin ? `You do not have an account?` : `Already have an account?`}</p>
+                  {/* <p className="text-lg">{isLogin ? `You do not have an account?` : `Already have an account?`}</p>
                   <button onClick={(event) => { setIsLogin(!isLogin) }}
-                    className="inline-block flex-none px-4 py-3 border-2 rounded-lg font-medium border-black bg-black text-white">{isLogin ? `Contact Us` : `Sign In`}</button>
+                    className="inline-block flex-none px-4 py-3 border-2 rounded-lg font-medium border-black bg-black text-white">{isLogin ? `Contact Us` : `Sign In`}</button> */}
                 </div>
-                <p className="font-medium">© 2022 Company</p>
+                <p className="font-medium">© 2023 Education System</p>
               </div>
 
               {/* LOGIN */}

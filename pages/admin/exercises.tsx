@@ -100,6 +100,7 @@ const Exercises: NextPageWithLayout = () => {
                 <button onClick={() => {
                     if (pageIndex > 1) {
                         setPageIndex(1);
+                        getTotal();
                     } else {
                         refatchExercise();
                         getTotal();
