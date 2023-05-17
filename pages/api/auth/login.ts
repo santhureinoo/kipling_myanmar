@@ -41,7 +41,9 @@ export default async function loginRoute(req: NextApiRequest, res: NextApiRespon
                 sign({
                     id: result[0].id,
                     admin: result[0].role === 1 ? true : false,
-                }, process.env.JWT_RAND_STRING || 'jaPxKT9uxA'), { req, res, maxAge: 60 * 60 * 24 });
+                }, process.env.JWT_RAND_STRING || 'jaPxKT9uxA'), { 
+                    sameSite:'lax',
+                    req, res, maxAge: 60 * 60 * 24 });
             res.send({ ok: true });
         }
         else {
