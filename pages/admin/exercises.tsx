@@ -20,7 +20,7 @@ const Exercises: NextPageWithLayout = () => {
 
     const getTotal = React.useCallback(() => {
         const options = {
-            url: `/api/total/exercises`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/total/exercises`,
             params: {
                 name: searchName,
             }
@@ -35,7 +35,7 @@ const Exercises: NextPageWithLayout = () => {
 
     const refatchExercise = React.useCallback(() => {
         const options = {
-            url: `/api/exercise/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/exercise/list`,
             params: {
                 name: searchName.toString(),
                 pageIndex: pageIndex.toString(),
@@ -57,7 +57,7 @@ const Exercises: NextPageWithLayout = () => {
     const onDelete = (index: number) => {
         const clonedExercises = cloneDeep(exercises);
         const options = {
-            url: '/api/exercise/delete',
+            url: process.env.NEXT_PUBLIC_URL +'/api/exercise/delete',
             data: clonedExercises[index]
         };
 
@@ -82,7 +82,7 @@ const Exercises: NextPageWithLayout = () => {
         delete currentExercise.updated_at;
 
         const options = {
-            url: `/api/exercise/update`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/exercise/update`,
             data: currentExercise,
         };
 

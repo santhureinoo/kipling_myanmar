@@ -37,7 +37,7 @@ export async function dailyMotionAuth(token: string | null) {
   if (!token) {
     let token;
     const options = {
-      url: '/api/dailymotion_auth',
+      url:'/api/dailymotion_auth',
     };
     const response: HttpResponse = await CapacitorHttp.get(options)
     // localStorage.setItem('daily_motion_token', JSON.stringify(response.data));

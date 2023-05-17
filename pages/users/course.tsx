@@ -38,7 +38,7 @@ const Course: NextPageWithLayout = () => {
             localStorage.setItem('daily_motion_token', JSON.stringify(response.data));
             if (currentExercise && currentExercise.actualFiles) {
                 const options = {
-                    url: `https://api.dailymotion.com/video/${currentExercise.actualFiles[index].unique_name}?fields=private_id`,
+                    url: process.env.NEXT_PUBLIC_URL +`https://api.dailymotion.com/video/${currentExercise.actualFiles[index].unique_name}?fields=private_id`,
                     headers: { 'Authorization': `Bearer ${response.data.access_token}` },
                 };
                 CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -69,7 +69,7 @@ const Course: NextPageWithLayout = () => {
         CapacitorHttp.get(options).then((response: HttpResponse) => {
             localStorage.setItem('daily_motion_token', JSON.stringify(response.data));
             const options = {
-                url: `https://api.dailymotion.com/video/${id}?fields=private_id`,
+                url: process.env.NEXT_PUBLIC_URL +`https://api.dailymotion.com/video/${id}?fields=private_id`,
                 headers: { 'Authorization': `Bearer ${response.data.access_token}` },
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -91,7 +91,7 @@ const Course: NextPageWithLayout = () => {
         // } else {
         //     const token = JSON.parse(localStorage.getItem('daily_motion_token') || '');
         //     const options = {
-        //         url: `https://api.dailymotion.com/video/${id}?fields=private_id`,
+        //         url: process.env.NEXT_PUBLIC_URL +`https://api.dailymotion.com/video/${id}?fields=private_id`,
         //         headers: { 'Authorization': `Bearer ${token.access_token}` },
         //     };
         //     CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -161,7 +161,7 @@ const Course: NextPageWithLayout = () => {
         setLoading(true);
         if (router.query['id']) {
             const options = {
-                url: '/api/course/single',
+                url: process.env.NEXT_PUBLIC_URL +'/api/course/single',
                 params: { id: router.query['id'] },
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -179,7 +179,7 @@ const Course: NextPageWithLayout = () => {
     React.useEffect(() => {
         if (selectedExerciseId) {
             const options = {
-                url: '/api/exercise/single',
+                url: process.env.NEXT_PUBLIC_URL +'/api/exercise/single',
                 params: { id: selectedExerciseId },
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -197,7 +197,7 @@ const Course: NextPageWithLayout = () => {
     React.useEffect(() => {
         if (course.trailer_id) {
             const options = {
-                url: `/api/file/single`,
+                url: process.env.NEXT_PUBLIC_URL +`/api/file/single`,
                 params: {
                     'id': course.trailer_id.toString()
                 }

@@ -18,7 +18,7 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
 
     React.useEffect(() => {
         const options = {
-            url: '/api/auth/user',
+            url: process.env.NEXT_PUBLIC_URL +'/api/auth/user',
         };
 
         CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -33,7 +33,7 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
 
     const onLogout = () => {
         const options = {
-            url: '/api/auth/logout',
+            url: process.env.NEXT_PUBLIC_URL +'/api/auth/logout',
         };
 
         CapacitorHttp.get(options).then((response: HttpResponse) => {

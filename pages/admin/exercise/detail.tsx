@@ -27,7 +27,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
 
     React.useEffect(() => {
         const options = {
-            url: '/api/course/list'
+            url: process.env.NEXT_PUBLIC_URL +'/api/course/list'
         };
         CapacitorHttp.get(options).then((response: HttpResponse) => {
             setCourses(response.data);
@@ -40,7 +40,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
         setLoading(true);
         if (router.query['id']) {
             const options = {
-                url: '/api/exercise/single',
+                url: process.env.NEXT_PUBLIC_URL +'/api/exercise/single',
                 params: { id: router.query['id'] },
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -172,7 +172,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
             return options;
         }
         const opt = {
-            url: `/api/file/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/file/list`,
             params: { name: filter },
         };
         const response = await CapacitorHttp.post(opt);
@@ -251,7 +251,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
                 }}
                 onSubmit={(_, { setSubmitting }) => {
                     const options = {
-                        url: `/api/exercise/${router.query['id'] ? 'update' : 'create'}`,
+                        url: process.env.NEXT_PUBLIC_URL +`/api/exercise/${router.query['id'] ? 'update' : 'create'}`,
                         data: {
                             exercise: exercise,
                             remQuest: removedQuestId,

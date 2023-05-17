@@ -36,7 +36,7 @@ const Files: NextPageWithLayout = () => {
 
     const getTotal = React.useCallback(() => {
         const options = {
-            url: `/api/total/files`,
+            url: process.env.NEXT_PUBLIC_URL + `/api/total/files`,
             params: {
                 name: searchName,
                 pageIndex: pageIndex.toString(),
@@ -53,7 +53,7 @@ const Files: NextPageWithLayout = () => {
 
     const refetchFiles = React.useCallback(() => {
         const options = {
-            url: `/api/file/list`,
+            url: process.env.NEXT_PUBLIC_URL + `/api/file/list`,
             params: {
                 name: searchName.toString(),
                 pageIndex: pageIndex.toString(),
@@ -70,7 +70,7 @@ const Files: NextPageWithLayout = () => {
     const pushToDailyMotion = (selectedfiles: FileList, token: any) => {
         setLoading(true);
         const options = {
-            url: 'https://api.dailymotion.com/file/upload',
+            url: process.env.NEXT_PUBLIC_URL + 'https://api.dailymotion.com/file/upload',
             headers: { 'Authorization': `Bearer ${token.access_token}` },
 
         };
@@ -92,7 +92,7 @@ const Files: NextPageWithLayout = () => {
                 CapacitorHttp.post(options).then((response: HttpResponse) => {
 
                     const options = {
-                        url: `https://api.dailymotion.com/user/SanThureinoo/videos`,
+                        url: process.env.NEXT_PUBLIC_URL + `https://api.dailymotion.com/user/SanThureinoo/videos`,
                         headers: {
                             'Authorization': `Bearer ${token.access_token}`,
                             "Content-Type": 'multipart/form-data'
@@ -114,7 +114,7 @@ const Files: NextPageWithLayout = () => {
                             return;
                         }
                         const options = {
-                            url: `https://api.dailymotion.com/video/${response.data.id}`,
+                            url: process.env.NEXT_PUBLIC_URL + `https://api.dailymotion.com/video/${response.data.id}`,
                             headers: {
                                 'Authorization': `Bearer ${token.access_token}`,
                                 "Content-Type": 'multipart/form-data'
@@ -137,7 +137,7 @@ const Files: NextPageWithLayout = () => {
                             };
 
                             const options = {
-                                url: `/api/file/create`,
+                                url: process.env.NEXT_PUBLIC_URL + `/api/file/create`,
                                 data: currentFile,
                             };
 
@@ -178,7 +178,7 @@ const Files: NextPageWithLayout = () => {
         delete currentFile.updated_at;
 
         const options = {
-            url: `/api/file/update`,
+            url: process.env.NEXT_PUBLIC_URL + `/api/file/update`,
             data: currentFile,
         };
 
@@ -194,7 +194,7 @@ const Files: NextPageWithLayout = () => {
         const currentFile: files = clonedFiles[index];
 
         const options = {
-            url: `/api/file/delete`,
+            url: process.env.NEXT_PUBLIC_URL + `/api/file/delete`,
             data: currentFile,
         };
 
@@ -211,7 +211,7 @@ const Files: NextPageWithLayout = () => {
         if (uploadedFiles) {
             // if (!localStorage.getItem('daily_motion_token')) {
             //     const options = {
-            //         url: '/api/dailymotion_auth',
+            //         url: process.env.NEXT_PUBLIC_URL +'/api/dailymotion_auth',
             //     };
             //     CapacitorHttp.get(options).then((response: HttpResponse) => {
             //         localStorage.setItem('daily_motion_token', JSON.stringify(response.data));
@@ -222,7 +222,7 @@ const Files: NextPageWithLayout = () => {
             // } else {
             //     const token = JSON.parse(localStorage.getItem('daily_motion_token') || '');
             //     const options = {
-            //         url: '/api/dailymotion_auth',
+            //         url: process.env.NEXT_PUBLIC_URL +'/api/dailymotion_auth',
             //         params: token
             //     };
             //     CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -251,7 +251,7 @@ const Files: NextPageWithLayout = () => {
             };
 
             const options = {
-                url: `/api/file/create`,
+                url: process.env.NEXT_PUBLIC_URL + `/api/file/create`,
                 data: currentFile,
             };
 

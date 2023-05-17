@@ -34,7 +34,7 @@ const CourseDetail: NextPageWithLayout = () => {
         setLoading(true);
         if (router.query['id']) {
             const options = {
-                url: '/api/course/single',
+                url: process.env.NEXT_PUBLIC_URL +'/api/course/single',
                 params: { id: router.query['id'] },
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -69,7 +69,7 @@ const CourseDetail: NextPageWithLayout = () => {
             return options;
         }
         const opt = {
-            url: `/api/file/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/file/list`,
             params: { name: filter },
         };
         const response = await CapacitorHttp.post(opt);
@@ -87,7 +87,7 @@ const CourseDetail: NextPageWithLayout = () => {
     React.useEffect(() => {
         if (course.trailer_id) {
             const options = {
-                url: `/api/file/single`,
+                url: process.env.NEXT_PUBLIC_URL +`/api/file/single`,
                 params: {
                     'id': course.trailer_id.toString()
                 }
@@ -122,7 +122,7 @@ const CourseDetail: NextPageWithLayout = () => {
                 delete modifiedCourse.exercise_ids;
                 delete modifiedCourse.exercise_names;
                 const options = {
-                    url: `/api/course/${course.id ? 'update' : 'create'}`,
+                    url: process.env.NEXT_PUBLIC_URL +`/api/course/${course.id ? 'update' : 'create'}`,
                     data: modifiedCourse,
                 };
                 setSubmitting(true);

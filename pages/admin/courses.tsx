@@ -17,7 +17,7 @@ const Courses: NextPageWithLayout = () => {
 
     React.useEffect(() => {
         const options = {
-            url: `/api/course/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/course/list`,
         };
         CapacitorHttp.post(options).then((response: HttpResponse) => {
             setCourses(response.data);
@@ -32,7 +32,7 @@ const Courses: NextPageWithLayout = () => {
         setLoading(true);
         const clonedCourses = cloneDeep(courses);
         const options = {
-            url: '/api/course/delete',
+            url: process.env.NEXT_PUBLIC_URL +'/api/course/delete',
             data: clonedCourses[index]
         };
 
@@ -58,7 +58,7 @@ const Courses: NextPageWithLayout = () => {
         delete currentCourse.updated_at;
 
         const options = {
-            url: `/api/course/update`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/course/update`,
             data: currentCourse,
         };
 

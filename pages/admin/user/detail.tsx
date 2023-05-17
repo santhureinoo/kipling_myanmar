@@ -42,7 +42,7 @@ const UserDetail: NextPageWithLayout = () => {
         setLoading(true);
         if (router.query['id']) {
             const options = {
-                url: '/api/user/single',
+                url: process.env.NEXT_PUBLIC_URL +'/api/user/single',
                 params: { id: router.query['id'] },
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -74,7 +74,7 @@ const UserDetail: NextPageWithLayout = () => {
     const onSave = (event: any) => {
         setLoading(true);
         const options = {
-            url: `/api/user/${router.query['id'] ? 'update' : 'create'}`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/user/${router.query['id'] ? 'update' : 'create'}`,
             params: { size: 'XL' },
             data: user,
         };
@@ -106,7 +106,7 @@ const UserDetail: NextPageWithLayout = () => {
             return options;
         }
         const opt = {
-            url: `/api/course/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/course/list`,
             params: { name: filter },
         };
         const response = await CapacitorHttp.post(opt);
@@ -169,7 +169,7 @@ const UserDetail: NextPageWithLayout = () => {
                 }}
                 onSubmit={(_, { setSubmitting }) => {
                     const options = {
-                        url: `/api/user/${router.query['id'] ? 'update' : 'create'}`,
+                        url: process.env.NEXT_PUBLIC_URL +`/api/user/${router.query['id'] ? 'update' : 'create'}`,
                         data: user,
                     };
 

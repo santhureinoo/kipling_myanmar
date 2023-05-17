@@ -17,7 +17,7 @@ const Groups: NextPageWithLayout = () => {
 
     React.useEffect(() => {
         const options = {
-            url: `/api/group/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/group/list`,
         };
         CapacitorHttp.post(options).then((response: HttpResponse) => {
             setGroups(response.data);
@@ -39,7 +39,7 @@ const Groups: NextPageWithLayout = () => {
         // delete currentCourse.updated_at;
 
         const options = {
-            url: `/api/group/update`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/group/update`,
             data: currentGroup,
         };
 

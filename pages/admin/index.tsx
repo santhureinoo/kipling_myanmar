@@ -48,7 +48,7 @@ const Home: NextPage = (result: any) => {
   // React.useEffect(() => {
   //   // let origin = Capacitor.isNative ? publicRuntimeConfig.api_origin : "";
   //   const options = {
-  //     url: '/api/hello',
+  //     url: process.env.NEXT_PUBLIC_URL +'/api/hello',
   //     headers: { 'X-Fake-Header': 'Fake-Value' },
   //     params: { size: 'XL' },
   //   };
@@ -59,7 +59,7 @@ const Home: NextPage = (result: any) => {
 
   React.useEffect(() => {
     const options = {
-      url: '/api/auth/user',
+      url: process.env.NEXT_PUBLIC_URL +'/api/auth/user',
     };
 
     CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -132,7 +132,7 @@ const Home: NextPage = (result: any) => {
                 }}
                 onSubmit={(user, { setErrors, setSubmitting }) => {
                   const options = {
-                    url: `/api/auth/login`,
+                    url: process.env.NEXT_PUBLIC_URL +`/api/auth/login`,
                     params: {
                       id: user.id || '',
                       password: user.password,

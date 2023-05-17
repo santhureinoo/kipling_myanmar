@@ -45,7 +45,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
 
     const getTotal = React.useCallback(() => {
         const options = {
-            url: `/api/total/users`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/total/users`,
             params: {
                 name: searchName
             }
@@ -60,7 +60,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
 
     const searchUsers = React.useCallback(() => {
         const options = {
-            url: `/api/user/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/user/list`,
             params: {
                 name: searchName.toString(),
                 pageIndex: pageIndex.toString(),
@@ -86,7 +86,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
         const cloneUsers = cloneDeep(users);
         cloneUsers[index][attribute] = value;
         const options = {
-            url: '/api/user/update',
+            url: process.env.NEXT_PUBLIC_URL +'/api/user/update',
             data: cloneUsers[index]
         };
 
@@ -102,7 +102,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
         setLoading(true);
         const cloneUsers = cloneDeep(users);
         const options = {
-            url: '/api/user/delete',
+            url: process.env.NEXT_PUBLIC_URL +'/api/user/delete',
             data: cloneUsers[index]
         };
 
@@ -130,7 +130,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
             return options;
         }
         const opt = {
-            url: `/api/group/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/group/list`,
             params: { name: filter },
         };
         const response = await CapacitorHttp.post(opt);
@@ -218,7 +218,7 @@ const Users: NextPageWithLayout = ({ result }: any) => {
                         }}
                         onSubmit={(_, { setSubmitting }) => {
                             const options = {
-                                url: `/api/user/bulk_create`,
+                                url: process.env.NEXT_PUBLIC_URL +`/api/user/bulk_create`,
                                 data: bulkUsers,
                             };
 

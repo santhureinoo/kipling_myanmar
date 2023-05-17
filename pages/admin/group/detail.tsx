@@ -27,7 +27,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
             return options;
         }
         const opt = {
-            url: `/api/user/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/user/list`,
             params: { name: filter },
         };
         const response = await CapacitorHttp.post(opt);
@@ -49,7 +49,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
             return options;
         }
         const opt = {
-            url: `/api/course/list`,
+            url: process.env.NEXT_PUBLIC_URL +`/api/course/list`,
             params: { name: filter },
         };
         const response = await CapacitorHttp.post(opt);
@@ -113,7 +113,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
         // setLoading(true);
         if (router.query['id']) {
             const options = {
-                url: '/api/group/single',
+                url: process.env.NEXT_PUBLIC_URL +'/api/group/single',
                 params: { id: router.query['id'] },
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -144,7 +144,7 @@ const ExerciseDetail: NextPageWithLayout = () => {
             }}
             onSubmit={(_, { setSubmitting }) => {
                 const options = {
-                    url: `/api/group/${router.query['id'] ? 'update' : 'create'}`,
+                    url: process.env.NEXT_PUBLIC_URL +`/api/group/${router.query['id'] ? 'update' : 'create'}`,
                     data: group,
                 };
 
