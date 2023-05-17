@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { CapacitorHttp, HttpResponse } from "@capacitor/core";
 import { useRouter } from "next/navigation";
 import { RingLoader } from "react-spinners";
+import { removeCookies } from "cookies-next";
 
 interface Props {
     title?: string;
@@ -32,15 +33,18 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
     }, [])
 
     const onLogout = () => {
-        const options = {
-            url: process.env.NEXT_PUBLIC_URL +'/api/auth/logout',
-        };
+        // const options = {
+        //     url: process.env.NEXT_PUBLIC_URL +'/api/auth/logout',
+        // };
 
-        CapacitorHttp.get(options).then((response: HttpResponse) => {
-            if (response.data.ok) {
-                router.push('/');
-            }
-        });
+        // CapacitorHttp.get(options).then((response: HttpResponse) => {
+        //     if (response.data.ok) {
+        //         router.push('/');
+        //     }
+        // });
+
+        removeCookies('bearer token');
+        router.push('/');
     }
     return <React.Fragment>
         <Head>
