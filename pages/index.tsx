@@ -61,9 +61,6 @@ const Home: NextPage = (result: any) => {
   React.useEffect(() => {
     const options = {
       url: process.env.NEXT_PUBLIC_URL + '/api/auth/user',
-      headers: {
-        'Cookie': `bearer token =${getCookie('bearer token')?.toString() || ""}`,
-      }
     };
 
     CapacitorHttp.get(options).then((response: HttpResponse) => {
