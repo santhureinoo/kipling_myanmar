@@ -1,5 +1,5 @@
 import { deleteCookie, removeCookies } from "cookies-next";
-import { NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { ironOptions } from "../../../utilities/db";
 
 export type User = {
@@ -8,7 +8,7 @@ export type User = {
     avatarUrl: string;
 };
 
-export default async function logoutRoute(req: any, res: NextApiResponse) {
+export default async function logoutRoute(req: NextApiRequest, res: NextApiResponse) {
     // Guard clause checks for first and last name,
     // and returns early if they are not found
     // req.session.destroy();

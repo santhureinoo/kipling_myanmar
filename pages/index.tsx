@@ -70,7 +70,6 @@ const Home: NextPage = (result: any) => {
     });
   }, [])
 
-
   const togglePart = React.useMemo(() => {
     // alert(userObj.name);
     if (isLogin) {
