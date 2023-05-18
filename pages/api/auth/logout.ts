@@ -16,7 +16,12 @@ export default async function logoutRoute(req: NextApiRequest, res: NextApiRespo
     //     "Set-Cookie", [
     //     `bearer token=deleted; Max-Age=0; path=/`]
     // );
-    deleteCookie('bearer token', { req, res });
+    deleteCookie('bearer token', {
+        sameSite: 'none',
+        secure: true,
+        httpOnly: true,
+        req, res
+    });
     return res.status(200).json({ ok: true })
 
 };
