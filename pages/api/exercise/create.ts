@@ -5,20 +5,26 @@ import { Sql } from 'sql-ts';
 import excuteQuery, { mysqlLastId } from '../../../utilities/db';
 import { answers, exercises, exercises_files, questions, users } from '../../../utilities/type';
 
+interface ExerciseWithRemove {
+    exercise: exercises,
+    remQuest: string[],
+    remAns: string[]
+}
+
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
 
     // Get data submitted in request's body.
-    const body: exercises = JSON.parse(req.body);
+    const body: ExerciseWithRemove = JSON.parse(req.body);
 
     //(optionally) set the SQL dialect
     const sql = new Sql('mysql');
 
     const exercise = sql.define<exercises>({
         name: 'exercises',
-        columns: ['id', 'name', 'courses_id']
+        columns: ['id', 'name', 'courses_id', 'status']
     });
 
     const question = sql.define<questions>({
@@ -46,7 +52,7 @@ export default async function handler(
 
     // const query = user.insert(user.id.value(body.id), user.status.value(body.status), user.name.value(body.name), user.password.value(body.password)).toQuery();
 
-    const exerciseQuery = exercise.insert(exercise.name.value(body.name), exercise.courses_id.value(body.courses_id)).toQuery();
+    const exerciseQuery = exercise.insert(exercise.name.value(body.exercise.name), exercise.courses_id.value(body.exercise.courses_id), exercise.status.value(1)).toQuery();
 
     const questionQuery = (data: any[]) => {
         return question.insert(data).toQuery();
@@ -64,10 +70,10 @@ export default async function handler(
         const result: any = await excuteQuery({ query: exerciseQuery.text, values: exerciseQuery.values });
         const exercise_id: any = await excuteQuery({ query: mysqlLastId });
 
-        if (body.files) {
+        if (body.exercise.files) {
             let fileData = [];
-            for (let index = 0; index < body.files.length; index++) {
-                const file = body.files[index];
+            for (let index = 0; index < body.exercise.files.length; index++) {
+                const file = body.exercise.files[index];
                 fileData.push({
                     exercises_id: exercise_id[0].ID,
                     files_id: file.value,
@@ -77,15 +83,16 @@ export default async function handler(
         }
 
         let questRes = [];
-        if (body.questions) {
-            for (let index = 0; index < body.questions.length; index++) {
+        if (body.exercise.questions) {
+            for (let index = 0; index < body.exercise.questions.length; index++) {
 
-                const quest = body.questions[index];
+                const quest = body.exercise.questions[index];
                 let questionData: any[] = [];
                 questionData.push({
                     question: quest.question,
                     type: quest.type,
                     exercise_id: exercise_id[0].ID,
+                    status: 1,
                 })
                 questRes.push(await excuteQuery({ query: questionQuery(questionData).text, values: questionQuery(questionData).values }));
                 const question_id: any = await excuteQuery({ query: mysqlLastId });
@@ -104,13 +111,14 @@ export default async function handler(
                     })
 
                     const errRes = await excuteQuery({ query: answerQuery(answerData).text, values: answerQuery(answerData).values });
-                    // console.log(errRes);
+                     console.log(errRes);
                 }
             }
         }
         return res.status(200).json({ "id": exercise_id, 'result': questRes });
 
     } catch (error: any) {
+        console.log(error);
         return res.status(400).json(error)
     }
 }

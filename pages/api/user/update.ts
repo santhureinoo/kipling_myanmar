@@ -53,11 +53,14 @@ export default async function handler(
             const data = body.course_ids.split(',').map(id => {
                 return {
                     users_id: body.id,
-                    courses_id: id
+                    courses_id: id,
+                    status: 1
                 }
             });
             const createJunctQuery = createJuntionQuery(data);
-            await excuteQuery({ query: createJunctQuery.text, values: createJunctQuery.values });
+            console.log(createJuntionQuery);
+            const ress =await excuteQuery({ query: createJunctQuery.text, values: createJunctQuery.values });
+            console.log(ress, 'res');
         }
         return res.status(200).json(result);
 
