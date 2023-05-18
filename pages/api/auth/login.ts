@@ -44,6 +44,7 @@ export default async function loginRoute(req: NextApiRequest, res: NextApiRespon
                 }, process.env.JWT_RAND_STRING || 'jaPxKT9uxA'), {
                 sameSite: 'none',
                 secure: true,
+                httpOnly: true,
                 req, res, maxAge: 60 * 60 * 24
             });
             res.send({ ok: true });

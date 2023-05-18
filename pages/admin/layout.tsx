@@ -33,17 +33,15 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
     }, [])
 
     const onLogout = () => {
-        // const options = {
-        //     url: process.env.NEXT_PUBLIC_URL +'/api/auth/logout',
-        // };
+        const options = {
+            url: process.env.NEXT_PUBLIC_URL +'/api/auth/logout',
+        };
 
-        // CapacitorHttp.get(options).then((response: HttpResponse) => {
-        //     if (response.data.ok) {
-        //         router.push('/admin');
-        //     }
-        // });
-        removeCookies('bearer token');
-        router.push('/admin');
+        CapacitorHttp.get(options).then((response: HttpResponse) => {
+            if (response.data.ok) {
+                router.push('/admin');
+            }
+        });
     }
 
     return <React.Fragment>
