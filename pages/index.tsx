@@ -14,6 +14,7 @@ import { initialLogin } from '../utilities/defaultData';
 import { Field, Form, Formik } from 'formik';
 import rfdc from 'rfdc';
 import { ClipLoader, RingLoader } from 'react-spinners';
+import { getCookie } from 'cookies-next';
 
 const cloneDeep = rfdc();
 
@@ -59,7 +60,10 @@ const Home: NextPage = (result: any) => {
 
   React.useEffect(() => {
     const options = {
-      url: process.env.NEXT_PUBLIC_URL +'/api/auth/user',
+      url: process.env.NEXT_PUBLIC_URL + '/api/auth/user',
+      headers: {
+        'Cookie': `bearer token =${getCookie('bearer token')?.toString() || ""}`,
+      }
     };
 
     CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -72,7 +76,6 @@ const Home: NextPage = (result: any) => {
 
   const togglePart = React.useMemo(() => {
     // alert(userObj.name);
-    console.log(userObj);
     if (isLogin) {
       return <Formik
         initialValues={userObj}
@@ -89,7 +92,7 @@ const Home: NextPage = (result: any) => {
         }}
         onSubmit={(user, { setErrors, setSubmitting }) => {
           const options = {
-            url: process.env.NEXT_PUBLIC_URL +`/api/auth/login`,
+            url: process.env.NEXT_PUBLIC_URL + `/api/auth/login`,
             params: {
               id: user.id || '',
               password: user.password
@@ -194,7 +197,7 @@ const Home: NextPage = (result: any) => {
         }}
         onSubmit={(user, { setSubmitting }) => {
           const options = {
-            url: process.env.NEXT_PUBLIC_URL +`/api/user/create`,
+            url: process.env.NEXT_PUBLIC_URL + `/api/user/create`,
             data: {
               name: user.name,
               password: user.password,
