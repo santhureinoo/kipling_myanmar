@@ -70,7 +70,7 @@ const Files: NextPageWithLayout = () => {
     const pushToDailyMotion = (selectedfiles: FileList, token: any) => {
         setLoading(true);
         const options = {
-            url: process.env.NEXT_PUBLIC_URL + 'https://api.dailymotion.com/file/upload',
+            url: 'https://api.dailymotion.com/file/upload',
             headers: { 'Authorization': `Bearer ${token.access_token}` },
 
         };
@@ -92,7 +92,7 @@ const Files: NextPageWithLayout = () => {
                 CapacitorHttp.post(options).then((response: HttpResponse) => {
 
                     const options = {
-                        url: process.env.NEXT_PUBLIC_URL + `https://api.dailymotion.com/user/SanThureinoo/videos`,
+                        url: `https://api.dailymotion.com/user/SanThureinoo/videos`,
                         headers: {
                             'Authorization': `Bearer ${token.access_token}`,
                             "Content-Type": 'multipart/form-data'
@@ -114,7 +114,7 @@ const Files: NextPageWithLayout = () => {
                             return;
                         }
                         const options = {
-                            url: process.env.NEXT_PUBLIC_URL + `https://api.dailymotion.com/video/${response.data.id}`,
+                            url: `https://api.dailymotion.com/video/${response.data.id}`,
                             headers: {
                                 'Authorization': `Bearer ${token.access_token}`,
                                 "Content-Type": 'multipart/form-data'

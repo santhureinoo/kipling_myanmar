@@ -38,7 +38,7 @@ const Course: NextPageWithLayout = () => {
             localStorage.setItem('daily_motion_token', JSON.stringify(response.data));
             if (currentExercise && currentExercise.actualFiles) {
                 const options = {
-                    url: process.env.NEXT_PUBLIC_URL +`https://api.dailymotion.com/video/${currentExercise.actualFiles[index].unique_name}?fields=private_id`,
+                    url: `https://api.dailymotion.com/video/${currentExercise.actualFiles[index].unique_name}?fields=private_id`,
                     headers: { 'Authorization': `Bearer ${response.data.access_token}` },
                 };
                 CapacitorHttp.get(options).then((response: HttpResponse) => {
@@ -69,7 +69,7 @@ const Course: NextPageWithLayout = () => {
         CapacitorHttp.get(options).then((response: HttpResponse) => {
             localStorage.setItem('daily_motion_token', JSON.stringify(response.data));
             const options = {
-                url: process.env.NEXT_PUBLIC_URL +`https://api.dailymotion.com/video/${id}?fields=private_id`,
+                url: `https://api.dailymotion.com/video/${id}?fields=private_id`,
                 headers: { 'Authorization': `Bearer ${response.data.access_token}` },
             };
             CapacitorHttp.get(options).then((response: HttpResponse) => {
