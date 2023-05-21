@@ -12,10 +12,10 @@ export default async function logoutRoute(req: NextApiRequest, res: NextApiRespo
     // Guard clause checks for first and last name,
     // and returns early if they are not found
     // req.session.destroy();
-    // res.setHeader(
-    //     "Set-Cookie", [
-    //     `bearer token=deleted; Max-Age=0; path=/`]
-    // );
+    res.setHeader(
+        "Set-Cookie", [
+        `bearer token=deleted; Max-Age=0; path=/`]
+    );
     deleteCookie('bearer token', {
         sameSite: 'none',
         secure: true,
