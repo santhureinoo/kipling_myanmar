@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { CapacitorHttp, HttpResponse } from "@capacitor/core";
 import { useRouter } from "next/navigation";
 import { RingLoader } from "react-spinners";
-import { removeCookies } from "cookies-next";
+import { deleteCookie, removeCookies } from "cookies-next";
 
 interface Props {
     title?: string;
@@ -39,6 +39,7 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
 
         CapacitorHttp.get(options).then((response: HttpResponse) => {
             if (response.data.ok) {
+                deleteCookie('bearer token');
                 router.push('/');
             }
         });

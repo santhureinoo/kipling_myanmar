@@ -1,5 +1,5 @@
 import { CapacitorHttp, HttpResponse } from "@capacitor/core";
-import { getCookie, removeCookies } from "cookies-next";
+import { deleteCookie, getCookie, removeCookies } from "cookies-next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -39,6 +39,7 @@ const Layout = ({ title = "", children, disableHeader = false, disableSideBar = 
 
         CapacitorHttp.get(options).then((response: HttpResponse) => {
             if (response.data.ok) {
+                deleteCookie('bearer token');
                 router.push('/admin');
             }
         });
