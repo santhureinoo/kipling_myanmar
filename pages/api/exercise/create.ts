@@ -92,7 +92,6 @@ export default async function handler(
                     question: quest.question,
                     type: quest.type,
                     exercise_id: exercise_id[0].ID,
-                    status: 1,
                 })
                 questRes.push(await excuteQuery({ query: questionQuery(questionData).text, values: questionQuery(questionData).values }));
                 const question_id: any = await excuteQuery({ query: mysqlLastId });
